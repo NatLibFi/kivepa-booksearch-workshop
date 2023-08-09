@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Books Search</title>
+</head>
+<body>
+    <h1>Book Search</h1>
+    <form action="/search" method="get">
+        <input type="text" name="q" placeholder="Enter book subject">
+        <button type="submit">Search</button>
+    </form>
+
+    <div id="results">
+        <!-- Search results will be displayed here -->
+    </div>
+
+    <script>
+        document.querySelector('form').addEventListener('submit', async (event) => {
+            event.preventDefault();
+            const query = document.querySelector('input[name="q"]').value;
+            const response = await fetch(`/search?q=${query}`);
+            const data = await response.json();
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.innerHTML = '';
+            if (data.results) {
+                data.results.forEach(result => {
+                    const resultDiv = document.createElement('div');
+                    resultDiv.innerHTML = `<p><strong>Title:</strong> ${result.title}</p>
+                                           <p><strong>Authors:</strong> ${result.authors}</p>
+                                           <p><strong>Year:</strong> ${result.year}</p>
+                                           <p><strong>Score:</strong> ${result.score}</p>
+                                            <button class="select-btn" data-title="${result.title}" data-authors="${result.authors}">Select</button>`;
+                    resultsDiv.appendChild(resultDiv);
+                });
+            } else {
+                resultsDiv.innerHTML = '<p>No results found.</p>';
+            }
+
+            // Attach event listeners to the "Select" buttons
+            const selectButtons = document.querySelectorAll('.select-btn');
+            selectButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const selectedTitle = button.getAttribute('data-title');
+                    const selectedAuthors = button.getAttribute('data-authors');
+                    submitSelectedResult(selectedTitle, selectedAuthors);
+                });
+            });
+
+        });
+
+        function submitSelectedResult(title, authors) {
+            const formData = new FormData();
+            formData.append('title', title);
+            formData.append('authors', authors);
+
+            fetch('/select', {
+                method: 'POST',
+                body: formData
+            }).then(response => {
+                // Handle response as needed
+            }).catch(error => {
+                console.error('Error selecting result:', error);
+            });
+        }
+    </script>
+</body>
+</html>
