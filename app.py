@@ -1,3 +1,4 @@
+import sqlite3
 from flask import Flask, request, render_template, jsonify
 from elasticsearch import Elasticsearch
 
@@ -41,11 +42,24 @@ def search_books():
 def select_result():
     selected_title = request.form.get('title')
     selected_authors = request.form.get('authors')
+    selected_year = request.form.get('year')
 
-    # Process the selected result as needed
-    # You can save it to a database, session, or perform any other action
-    print(f"Selected {selected_title} by {selected_authors}")
-    return jsonify({"message": "Result selected successfully"})
+    # Connect to the SQLite database
+    connection = sqlite3.connect('database.db')
+    cursor = connection.cursor()
+
+    # Insert the selected result into the database
+    cursor.execute('''
+        INSERT INTO selected_books (title, authors, year)
+        VALUES (?, ?, ?)
+    ''', (selected_title, selected_authors, selected_year))
+
+    # Commit the changes and close the connection
+    connection.commit()
+    connection.close()
+
+    return jsonify({"message": "Result selected and saved successfully"})
+
 
 if __name__ == "__main__":
     app.run(debug=True)
