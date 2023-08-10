@@ -12,7 +12,8 @@ cursor.execute(
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         title TEXT,
         authors TEXT,
-        year INTEGER
+        year INTEGER,
+        source TEXT
     )
 """
 )

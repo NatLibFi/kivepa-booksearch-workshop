@@ -29,7 +29,7 @@
                                            <p><strong>Authors:</strong> ${result.authors}</p>
                                            <p><strong>Year:</strong> ${result.year}</p>
                                            <p><strong>Score:</strong> ${result.score}</p>
-                                            <button class="select-btn" data-title="${result.title}" data-authors="${result.authors}">Select</button>`;
+                                            <button class="select-btn" data-title="${result.title}" data-authors="${result.authors}">Select and new search</button>`;
                     resultsDiv.appendChild(resultDiv);
                 });
             } else {
@@ -43,6 +43,7 @@
                     const selectedTitle = button.getAttribute('data-title');
                     const selectedAuthors = button.getAttribute('data-authors');
                     submitSelectedResult(selectedTitle, selectedAuthors);
+                    clearSearchResults();
                 });
             });
 
@@ -61,6 +62,10 @@
             }).catch(error => {
                 console.error('Error selecting result:', error);
             });
+        }
+
+        function clearSearchResults() {
+        document.getElementById('results').innerHTML = '';
         }
     </script>
 </body>

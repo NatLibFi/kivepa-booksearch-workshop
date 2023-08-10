@@ -14,6 +14,7 @@ def index_ndjson_from_stdin(index_name):
     actions = []
     for line in sys.stdin:
         document = json.loads(line)
+        document["subjects-a"] = document.pop("subjects")
         action = {"_index": index_name, "_source": document}
         actions.append(action)
 
