@@ -46,7 +46,8 @@ data = json.loads(sys.stdin.read())
 books = data["results"]["bindings"]
 
 actions = []
-skipped = 0
+loaded_books = set()
+errored = 0
 cnt = 0
 for book in books:
     cnt += 1
@@ -54,7 +55,12 @@ for book in books:
         document = parse_book_json(book)  # to be imported to Elasticsearch
     except KeyError as err:
         print(err)
-        skipped += 1
+        errored += 1
+
+    # Skip importing duplicates
+    if document["work-uri"] in loaded_books:
+        continue
+    loaded_books.add(document["work-uri"])
 
     document["subjects-a-labels"] = resolve_uris_to_labels(document["subjects-a-uris"])
 
@@ -72,4 +78,4 @@ for book in books:
 if actions:
     helpers.bulk(es, actions)
 
-print(f"Number of books skipped: {skipped}")
+print(f"Number of books skipped: {errored}")

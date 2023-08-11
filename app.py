@@ -1,7 +1,6 @@
 import sqlite3
 import random
 from flask import Flask, request, render_template, jsonify, session
-from flask_session import Session
 from elasticsearch import Elasticsearch
 
 app = Flask(__name__)
