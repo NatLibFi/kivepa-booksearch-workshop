@@ -25,7 +25,7 @@ def search_books():
         return jsonify({"error": "Missing 'q' parameter"}), 400
 
 
-    body = {"query": {"match": {f"subjects-{session['source']}": query}}}
+    body = {"query": {"match": {f"subjects-{session['source']}-labels": query}}}
     # body = {"query": {"fuzzy": {"subjects": {"value": query}}}}
 
     try:
@@ -37,7 +37,7 @@ def search_books():
             result = {
                 "title": source["title"],
                 "authors": source.get("authors", "N/A"),
-                "year": source.get("publicationDates", "N/A"),
+                "year": source.get("year", "N/A"),
                 "score": hit["_score"],
             }
             results.append(result)
