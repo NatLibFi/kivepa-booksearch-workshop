@@ -13,7 +13,8 @@ cursor.execute(
         title TEXT,
         authors TEXT,
         year INTEGER,
-        source TEXT
+        source TEXT,
+        searchTerms TEXT
     )
 """
 )

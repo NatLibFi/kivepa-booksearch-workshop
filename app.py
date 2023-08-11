@@ -50,6 +50,7 @@ def select_result():
     selected_title = request.form.get('title')
     selected_authors = request.form.get('authors')
     selected_year = request.form.get('year')
+    search_terms = request.form.get('searchTerms')
     source = session["source"]
 
     # Connect to the SQLite database
@@ -58,9 +59,9 @@ def select_result():
 
     # Insert the selected result into the database
     cursor.execute('''
-        INSERT INTO selected_books (title, authors, year, source)
-        VALUES (?, ?, ?, ?)
-    ''', (selected_title, selected_authors, selected_year, source))
+        INSERT INTO selected_books (title, authors, year, source, searchTerms)
+        VALUES (?, ?, ?, ?, ?)
+    ''', (selected_title, selected_authors, selected_year, source, search_terms))
 
     # Commit the changes and close the connection
     connection.commit()

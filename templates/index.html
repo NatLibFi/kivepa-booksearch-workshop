@@ -43,18 +43,19 @@
                     const selectedTitle = button.getAttribute('data-title');
                     const selectedAuthors = button.getAttribute('data-authors');
                     const selectedYear = button.getAttribute('data-year');
-                    submitSelectedResult(selectedTitle, selectedAuthors, selectedYear);
+                    submitSelectedResult(selectedTitle, selectedAuthors, selectedYear, query);
                     clearSearchResults();
                 });
             });
 
         });
 
-        function submitSelectedResult(title, authors, year) {
+        function submitSelectedResult(title, authors, year, searchTerms) {
             const formData = new FormData();
             formData.append('title', title);
             formData.append('authors', authors);
             formData.append('year', year);
+            formData.append('searchTerms', searchTerms);
 
             fetch('/select', {
                 method: 'POST',

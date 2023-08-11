@@ -67,7 +67,7 @@ for book in books:
     action = {"_index": index_name, "_source": document}
     actions.append(action)
 
-    if cnt >= 100:  # TMP, for getting small dev set
+    if cnt >= 200:  # TMP, for getting small dev set
         break
 
     if len(actions) >= 1000:  # Adjust batch size as needed
