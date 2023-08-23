@@ -38,7 +38,6 @@ def resolve_uris_to_labels(uris):
                 print(err)
                 print(resp)
             labels.append(label)
-        sleep(0.1)
     return labels
 
 
@@ -67,6 +66,7 @@ for book in books:
     action = {"_index": index_name, "_source": document}
     actions.append(action)
 
+    sleep(1)
     if cnt >= 200:  # TMP, for getting small dev set
         break
 
