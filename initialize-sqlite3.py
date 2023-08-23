@@ -14,6 +14,7 @@ cursor.execute(
         authors TEXT,
         year INTEGER,
         source TEXT,
+        isbn INTEGER,
         searchTerms TEXT
     )
 """

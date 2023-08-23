@@ -38,6 +38,7 @@ def search_books():
                 "authors": source.get("authors", "N/A"),
                 "year": source.get("year", "N/A"),
                 "score": hit["_score"],
+                "isbn": 9789512423514,  # TODO Replace with isbn from Elasticsearch
             }
             results.append(result)
         return jsonify({"results": results})
@@ -50,6 +51,7 @@ def select_result():
     selected_title = request.form.get('title')
     selected_authors = request.form.get('authors')
     selected_year = request.form.get('year')
+    selected_isbn = request.form.get('isbn')
     search_terms = request.form.get('searchTerms')
     source = session["source"]
 
@@ -59,9 +61,9 @@ def select_result():
 
     # Insert the selected result into the database
     cursor.execute('''
-        INSERT INTO selected_books (title, authors, year, source, searchTerms)
-        VALUES (?, ?, ?, ?, ?)
-    ''', (selected_title, selected_authors, selected_year, source, search_terms))
+        INSERT INTO selected_books (title, authors, year, source, isbn, searchTerms)
+        VALUES (?, ?, ?, ?, ?, ?)
+    ''', (selected_title, selected_authors, selected_year, source, selected_isbn, search_terms))
 
     # Commit the changes and close the connection
     connection.commit()

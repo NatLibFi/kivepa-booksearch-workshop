@@ -2,6 +2,13 @@
 <html>
 <head>
     <title>Books Search</title>
+    <style>
+        /* Define the CSS style for the smaller image */
+        .book-cover {
+            max-width: 100px; /* Adjust the max width as needed */
+            height: auto;
+        }
+    </style>
 </head>
 <body>
     <h1>Book Search</h1>
@@ -17,6 +24,8 @@
     <script>
         document.querySelector('form').addEventListener('submit', async (event) => {
             event.preventDefault();
+            const coverImageUrl = "https://www.finna.fi/Cover/Show?source=Solr&invisbn="
+
             const query = document.querySelector('input[name="q"]').value;
             const response = await fetch(`/search?q=${query}`);
             const data = await response.json();
@@ -29,7 +38,8 @@
                                            <p><strong>Authors:</strong> ${result.authors}</p>
                                            <p><strong>Year:</strong> ${result.year}</p>
                                            <p><strong>Score:</strong> ${result.score}</p>
-                                            <button class="select-btn" data-title="${result.title}" data-authors="${result.authors}" data-year="${result.year}">Select and new search</button>`;
+                                           <img src="${coverImageUrl}${result.isbn}" alt="Cover Image" class="book-cover">
+                                           <button class="select-btn" data-title="${result.title}" data-authors="${result.authors}" data-year="${result.year}" data-isbn="${result.isbn}">Select and new search</button>`;
                     resultsDiv.appendChild(resultDiv);
                 });
             } else {
@@ -43,18 +53,20 @@
                     const selectedTitle = button.getAttribute('data-title');
                     const selectedAuthors = button.getAttribute('data-authors');
                     const selectedYear = button.getAttribute('data-year');
-                    submitSelectedResult(selectedTitle, selectedAuthors, selectedYear, query);
+                    const selectedISBN = button.getAttribute('data-isbn');
+                    submitSelectedResult(selectedTitle, selectedAuthors, selectedYear, selectedISBN, query);
                     clearSearchResults();
                 });
             });
 
         });
 
-        function submitSelectedResult(title, authors, year, searchTerms) {
+        function submitSelectedResult(title, authors, year, isbn, searchTerms) {
             const formData = new FormData();
             formData.append('title', title);
             formData.append('authors', authors);
             formData.append('year', year);
+            formData.append('isbn', isbn);
             formData.append('searchTerms', searchTerms);
 
             fetch('/select', {
@@ -68,7 +80,7 @@
         }
 
         function clearSearchResults() {
-        document.getElementById('results').innerHTML = '';
+            document.getElementById('results').innerHTML = '';
         }
     </script>
 </body>
