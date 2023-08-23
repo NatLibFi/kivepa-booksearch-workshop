@@ -3,10 +3,75 @@
 <head>
     <title>Books Search</title>
     <style>
-        /* Define the CSS style for the smaller image */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+
+        h1 {
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        form {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        input[type="text"] {
+            padding: 8px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            margin-right: 10px;
+        }
+
+        button[type="submit"] {
+            padding: 8px 15px;
+            font-size: 16px;
+            background-color: #007bff;
+            border: none;
+            color: white;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        #results {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .result {
+            display: flex;
+            align-items: center;
+            border: 1px solid #ddd;
+            padding: 10px;
+            margin: 10px 0;
+            background-color: white;
+            box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
         .book-cover {
-            max-width: 100px; /* Adjust the max width as needed */
+            max-width: 100px;
             height: auto;
+            margin-right: 10px;
+        }
+
+        .result-details {
+            flex: 1;
+        }
+
+        .select-btn {
+            padding: 6px 12px;
+            font-size: 14px;
+            background-color: #28a745;
+            border: none;
+            color: white;
+            border-radius: 4px;
+            cursor: pointer;
         }
     </style>
 </head>
