@@ -40,7 +40,7 @@
         }
 
         #results {
-            max-width: 800px;
+            max-width: 500px;
             margin: 0 auto;
         }
 
@@ -57,11 +57,12 @@
         .book-cover {
             max-width: 100px;
             height: auto;
-            margin-right: 10px;
+            margin: 20px;
         }
 
         .result-details {
             flex: 1;
+            margin-left: 20px;
         }
 
         .select-btn {
@@ -97,17 +98,22 @@
             const resultsDiv = document.getElementById('results');
             resultsDiv.innerHTML = '';
             if (data.results) {
-                data.results.forEach(result => {
-                    const resultDiv = document.createElement('div');
-                    resultDiv.innerHTML = `<p><strong>Title:</strong> ${result.title}</p>
-                                           <p><strong>Authors:</strong> ${result.authors}</p>
-                                           <p><strong>Year:</strong> ${result.year}</p>
-                                           <p><strong>Score:</strong> ${result.score}</p>
-                                           <img src="${coverImageUrl}${result.isbn}" alt="Cover Image" class="book-cover">
-                                           <button class="select-btn" data-title="${result.title}" data-authors="${result.authors}" data-year="${result.year}" data-isbn="${result.isbn}">Select and new search</button>`;
-                    resultsDiv.appendChild(resultDiv);
-                });
-            } else {
+            data.results.forEach(result => {
+                const resultDiv = document.createElement('div');
+                resultDiv.classList.add('result'); // Add the result class
+                resultDiv.innerHTML = `
+                    <img src="${coverImageUrl}${result.isbn}" alt="Cover Image" class="book-cover">
+                    <div class="result-details">
+                        <p><strong>Title:</strong> ${result.title}</p>
+                        <p><strong>Authors:</strong> ${result.authors}</p>
+                        <p><strong>Year:</strong> ${result.year}</p>
+                        <p><strong>ISBN:</strong> ${result.isbn}</p>
+                        <button class="select-btn" data-title="${result.title}" data-authors="${result.authors}" data-year="${result.year}" data-isbn="${result.isbn}">Select and new search</button>
+                    </div>
+                `;
+                resultsDiv.appendChild(resultDiv);
+            });
+        } else {
                 resultsDiv.innerHTML = '<p>No results found.</p>';
             }
 
