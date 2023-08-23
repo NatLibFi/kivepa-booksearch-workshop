@@ -39,6 +39,11 @@
             cursor: pointer;
         }
 
+        .total-count {
+            /* text-align: center; */
+            margin-bottom: 20px;
+        }
+
         #results {
             max-width: 500px;
             margin: 0 auto;
@@ -96,7 +101,15 @@
             const response = await fetch(`/search?q=${query}`);
             const data = await response.json();
             const resultsDiv = document.getElementById('results');
+            const totalCount = data.results ? data.results.length : 0; // Get the total count of results
             resultsDiv.innerHTML = '';
+
+            // Display the total number of results
+            const totalCountDiv = document.createElement('div');
+            totalCountDiv.classList.add('total-count');
+            totalCountDiv.textContent = `Total Results: ${totalCount}`;
+            resultsDiv.appendChild(totalCountDiv);
+
             if (data.results) {
             data.results.forEach(result => {
                 const resultDiv = document.createElement('div');
