@@ -25,7 +25,7 @@ def parse_book_json(book):
     document["title"] = book["title"]["value"]
     document["authors"] = book["authorNames"]["value"]
     document["desc"] = book["desc"]["value"]
-    # document["inst"] = book["inst"]["value"]
+    document["isbn"] = "1234"  # TODO Needs to adjust the SPARQL
     document["year"] = book["pubLabel"]["value"]
     return document
 
@@ -65,7 +65,7 @@ for book in books:
     try:
         document = parse_book_json(book)  # to be imported to Elasticsearch
     except KeyError as err:
-        print(err)
+        print(f"Key not found: {err}")
         errored += 1
 
     # Skip importing duplicates
@@ -84,10 +84,11 @@ for book in books:
     if cnt >= 200:  # TMP, for getting small dev set
         break
 
-    if len(actions) >= 1000:  # Adjust batch size as needed
-        print("Importing 1k-documents batch")
+    if len(actions) >= 100:  # Adjust batch size as needed
+        print("Importing 100-documents batch...")
         helpers.bulk(es, actions)
         actions = []
+        print("Done")
 
 if actions:
     helpers.bulk(es, actions)
