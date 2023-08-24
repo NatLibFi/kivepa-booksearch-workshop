@@ -1,7 +1,12 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <title>Books Search</title>
+    <!-- Include jQuery and jQuery UI -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -81,11 +86,30 @@
         }
     </style>
 </head>
+
 <body>
     <h1>Book Search</h1>
     <form action="/search" method="get">
-        <input type="text" name="q" placeholder="Enter book subject">
+        <input type="text" id="search-input" name="q" placeholder="Enter book subject">
         <button type="submit">Search</button>
+
+        <script>
+            $(function () {
+                $("#search-input").autocomplete({
+                    source: function (request, response) {
+                        $.ajax({
+                            url: "/autocomplete",
+                            data: { q: request.term },
+                            dataType: "json",
+                            success: function (data) {
+                                response(data);
+                            }
+                        });
+                    }
+                });
+            });
+        </script>
+
     </form>
 
     <div id="results">
@@ -111,10 +135,10 @@
             resultsDiv.appendChild(totalCountDiv);
 
             if (data.results) {
-            data.results.forEach(result => {
-                const resultDiv = document.createElement('div');
-                resultDiv.classList.add('result'); // Add the result class
-                resultDiv.innerHTML = `
+                data.results.forEach(result => {
+                    const resultDiv = document.createElement('div');
+                    resultDiv.classList.add('result'); // Add the result class
+                    resultDiv.innerHTML = `
                     <img src="${coverImageUrl}${result.isbn}" alt="Cover Image" class="book-cover">
                     <div class="result-details">
                         <p><strong>Title:</strong> ${result.title}</p>
@@ -124,9 +148,9 @@
                         <button class="select-btn" data-title="${result.title}" data-authors="${result.authors}" data-year="${result.year}" data-isbn="${result.isbn}">Select and new search</button>
                     </div>
                 `;
-                resultsDiv.appendChild(resultDiv);
-            });
-        } else {
+                    resultsDiv.appendChild(resultDiv);
+                });
+            } else {
                 resultsDiv.innerHTML = '<p>No results found.</p>';
             }
 
@@ -168,4 +192,5 @@
         }
     </script>
 </body>
+
 </html>
