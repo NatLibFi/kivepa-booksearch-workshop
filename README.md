@@ -1,11 +1,12 @@
 # kvp-2023 workshop
 
-## Set up environment:
+## Set up locally
+### Set up environment:
     python3 -m venv venv
     source venv/bin/activate
     pip install flask elasticsearch requests
 
-## Set up Elasticsearch
+### Set up Elasticsearch
     docker run --rm --net elastic --name es-node01 -p 9200:9200 -p 9300:9300 -e "xpack.security.enabled=false" -e "discovery.type=single-node" docker.elastic.co/elasticsearch/elasticsearch:8.9.0
 
     # curl -X DELETE "localhost:9200/books"  # Delete existing index
@@ -15,11 +16,12 @@
     # curl -X DELETE "localhost:9200/labels"  # Delete existing index
     python create-autocomplete-index.py
 
-## Set up sqlite for storing results
+### Set up sqlite for storing results
     python initialize-sqlite3.py
 
-## Start appliction
+### Start appliction
     flask run --debug
+    # gunicorn app:app  # Alternatively use gunicorn
 
 # How to set up the Apache Jena
 Needed for running SPARQL query to process the file [kirjasampo-bib.json-ld.gz](https://github.com/NatLibFi/Annif-corpora-restricted/blob/master/kirjasampo/kirjasampo-bib.json-ld.gz).
