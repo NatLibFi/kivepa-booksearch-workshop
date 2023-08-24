@@ -1,5 +1,6 @@
 import sqlite3
 import random
+from datetime import datetime, timezone
 from flask import Flask, request, render_template, jsonify, session
 from elasticsearch import Elasticsearch
 
@@ -84,6 +85,7 @@ def select_result():
     selected_isbn = request.form.get("isbn")
     search_terms = request.form.get("searchTerms")
     source = session["source"]
+    current_time_utc = str(datetime.now(timezone.utc))
 
     # Connect to the SQLite database
     connection = sqlite3.connect("database.db")
@@ -92,8 +94,9 @@ def select_result():
     # Insert the selected result into the database
     cursor.execute(
         """
-        INSERT INTO selected_books (title, authors, year, source, isbn, searchTerms)
-        VALUES (?, ?, ?, ?, ?, ?)
+        INSERT INTO selected_books (title, authors, year, source, isbn,
+        searchTerms, selectionTimeUtc)
+        VALUES (?, ?, ?, ?, ?, ?, ?)
     """,
         (
             selected_title,
@@ -102,6 +105,7 @@ def select_result():
             source,
             selected_isbn,
             search_terms,
+            current_time_utc,
         ),
     )
 

@@ -15,7 +15,8 @@ cursor.execute(
         year INTEGER,
         source TEXT,
         isbn INTEGER,
-        searchTerms TEXT
+        searchTerms TEXT,
+        selectionTimeUtc TEXT
     )
 """
 )
