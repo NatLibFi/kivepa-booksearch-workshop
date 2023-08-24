@@ -163,7 +163,10 @@
                     const selectedYear = button.getAttribute('data-year');
                     const selectedISBN = button.getAttribute('data-isbn');
                     submitSelectedResult(selectedTitle, selectedAuthors, selectedYear, selectedISBN, query);
-                    clearSearchResults();
+                    // Clear search results
+                    document.getElementById('results').innerHTML = '';
+                    // Clear the search input field
+                    document.querySelector('#search-input').value = '';
                 });
             });
 
@@ -185,10 +188,6 @@
             }).catch(error => {
                 console.error('Error selecting result:', error);
             });
-        }
-
-        function clearSearchResults() {
-            document.getElementById('results').innerHTML = '';
         }
     </script>
 </body>
