@@ -1,4 +1,4 @@
-FROM python:3.8-slim-bookworm
+FROM quay.io/juhoinkinen/python:3.8-slim-bookworm
 
 
 RUN apt-get update && apt-get upgrade && rm -rf /var/lib/apt/lists/*
