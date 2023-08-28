@@ -22,6 +22,6 @@ spec:
           image: >-
             image-registry.openshift-image-registry.svc:5000/annif/{{ .Release.Name }}-app:latest
           command: ["gunicorn", "app:app", "--bind", "0.0.0.0:8000"]
-          # ports:
-          #   - containerPort: 8000
-          #     protocol: TCP
+          env:
+            - name: "elasticsearch-url"
+              value: "http://{{ .Release.Name }}-elasticsearch:9200"
