@@ -29,11 +29,11 @@ The deploykey for the private repository containing Dockerfile needs to be in pl
     
 ### Create indices
     
-    # curl -X DELETE "https://kvp-2023-workshop-elasticsearch.ext.kk-test.k8s.it.helsinki.fi:443/boooks"  # Delete old
-    # curl -X DELETE "https://kvp-2023-workshop-elasticsearch.ext.kk-test.k8s.it.helsinki.fi:443/labels"  # Delete old
+    # curl -X DELETE "https://kvp-2023-workshop-elasticsearch.apps.kk-test.k8s.it.helsinki.fi:443/boooks"  # Delete old
+    # curl -X DELETE "https://kvp-2023-workshop-elasticsearch.apps.kk-test.k8s.it.helsinki.fi:443/labels"  # Delete old
 
-    python import-books-to-es.py https://kvp-2023-workshop-elasticsearch.ext.kk-test.k8s.it.helsinki.fi:443
-    python create-autocomplete-index.py https://kvp-2023-workshop-elasticsearch.ext.kk-test.k8s.it.helsinki.fi:443
+    python import-books-to-es.py https://kvp-2023-workshop-elasticsearch.apps.kk-test.k8s.it.helsinki.fi:443
+    python create-autocomplete-index.py https://kvp-2023-workshop-elasticsearch.apps.kk-test.k8s.it.helsinki.fi:443
     
     # oc rsh deployment/kvp-2023-workshop-app python -c "from elasticsearch import Elasticsearch; es = Elasticsearch('http://kvp-2023-workshop-elasticsearch:9200'); print(es.indices.get(index='*'))"  # from inside OCP
 
