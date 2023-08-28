@@ -1,0 +1,27 @@
+kind: BuildConfig
+apiVersion: build.openshift.io/v1
+metadata:
+  annotations:
+  name: {{ .Release.Name }}-app
+  labels:
+    app.kubernetes.io/name: app
+    app.kubernetes.io/instance: {{ .Release.Name }}
+spec:
+  output:
+    to:
+      kind: ImageStreamTag
+      name: '{{ .Release.Name }}-app:latest'
+  successfulBuildsHistoryLimit: 5
+  failedBuildsHistoryLimit: 5
+  strategy:
+    type: Docker
+  source:
+    type: Git
+    git:
+      uri: 'git@github.com:juhoinkinen/kvp-2023'
+      ref: 'dockerization'
+    sourceSecret:
+      name: kvp-2023-annif-workshop-github-repo
+  triggers:
+    - type: ConfigChange
+  runPolicy: Serial

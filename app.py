@@ -1,3 +1,4 @@
+import os
 import sqlite3
 import random
 from datetime import datetime, timezone
@@ -10,7 +11,8 @@ app.config[
     "SESSION_TYPE"
 ] = "filesystem"  # You can also use other session types like 'redis'
 
-es = Elasticsearch("http://localhost:9200")
+es_url = os.getenv("elasticsearch-url", "http://localhost:9200")
+es = Elasticsearch(es_url)
 
 
 @app.route("/")

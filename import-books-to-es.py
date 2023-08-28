@@ -1,4 +1,5 @@
 from elasticsearch import Elasticsearch, helpers
+import gzip
 import sys
 import json
 import requests
@@ -8,14 +9,20 @@ from annif_client import AnnifClient
 
 
 # Connect to Elasticsearch
-es = Elasticsearch(["http://localhost:9200"])
+if len(sys.argv) > 1:
+    es_url = sys.argv[1]
+else:
+    es_url = "http://localhost:9200"
+es = Elasticsearch(es_url)
+
 # Define the index name
 index_name = "books"
 
+FINTO_API_QUERY_BASE = "https://api.finto.fi/rest/v1/label"
 
-API_BASE = 'https://ai.dev.finto.fi/v1/'
+ANNIF_API_BASE = 'https://ai.dev.finto.fi/v1/'
 PROJECT_ID = 'kauno-ensemble-fi'
-annif = AnnifClient(api_base=API_BASE)
+annif = AnnifClient(api_base=ANNIF_API_BASE)
 
 
 def parse_book_json(book):
@@ -30,14 +37,11 @@ def parse_book_json(book):
     return document
 
 
-finto_api_label_query_base = f"https://api.finto.fi/rest/v1/label"
-
-
 def resolve_uris_to_labels(uris):
     labels = []
     for uri in uris:
         params = {"uri": uri, "lang": "fi"}
-        resp = requests.get(finto_api_label_query_base, params=params)
+        resp = requests.get(FINTO_API_QUERY_BASE, params=params)
         if resp.ok:
             try:
                 label = resp.json()["prefLabel"]
@@ -53,8 +57,10 @@ def annif_suggest(text):
     return [res['uri'] for res in results]
 
 
-data = json.loads(sys.stdin.read())
-books = data["results"]["bindings"]
+# Read books from file
+with gzip.open('ks-bib.json.gz', 'rt') as books_file:
+    books = json.loads(books_file.read())["results"]["bindings"]
+print(f"Read {len(books)} books from file")
 
 actions = []
 loaded_books = set()
