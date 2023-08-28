@@ -1,13 +1,17 @@
+import sys
 from elasticsearch import Elasticsearch, helpers
 
 # Get all unique labels from two fields of an existing index
 # and create a new index where they are used for autocompletion
 
-es = Elasticsearch("http://localhost:9200")
-
+# Connect to Elasticsearch
+if len(sys.argv) > 1:
+    es_url = sys.argv[1]
+else:
+    es_url = "http://localhost:9200"
+es = Elasticsearch(es_url)
 
 # First get the labels
-
 source_index_name = "books"
 field_name_a = "subjects-a-labels"
 field_name_b = "subjects-b-labels"
@@ -48,7 +52,6 @@ print(f"Number of labels: {len(labels)}")
 
 
 # Then create the new index
-
 labels_index_name = "labels"
 labels_field_name = "label_suggest"
 
