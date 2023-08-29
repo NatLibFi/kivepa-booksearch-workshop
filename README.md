@@ -7,10 +7,10 @@
     pip install flask elasticsearch requests
 
 ### Set up Elasticsearch
-    docker run --rm --net elastic --name es-node01 -p 9200:9200 -p 9300:9300 -e "xpack.security.enabled=false" -e "discovery.type=single-node" docker.elastic.co/elasticsearch/elasticsearch:8.9.0
+    docker run --rm --net elastic --name es-node01 -p 9200:9200 -p 9300:9300 -e "xpack.security.enabled=false" -e "discovery.type=single-node" -v es-data:/usr/share/elasticsearch/data docker.elastic.co/elasticsearch/elasticsearch:8.9
 
     # curl -X DELETE "localhost:9200/books"  # Delete existing index
-    time python import-books-to-es.py  # Takes 5 min for 200 books
+    time python import-books-to-es.py  # Takes 5 min for 200 books, 20 min for 1000 books
 
     # curl -X DELETE "localhost:9200/labels"  # Delete existing index
     python create-autocomplete-index.py
