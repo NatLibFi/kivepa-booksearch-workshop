@@ -32,3 +32,10 @@ spec:
               value: "false"
             - name: "discovery.type"
               value: "single-node"
+          volumeMounts:
+            - mountPath: /usr/share/elasticsearch/data
+              name: es-data
+      volumes:
+        - name: es-data
+          persistentVolumeClaim:
+            claimName: {{ .Release.Name }}-es-data
