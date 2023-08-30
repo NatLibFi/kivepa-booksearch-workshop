@@ -1,6 +1,7 @@
 import os
 import sqlite3
 import random
+import uuid
 from datetime import datetime, timezone
 from flask import Flask, request, render_template, jsonify, session
 from elasticsearch import Elasticsearch
@@ -17,6 +18,8 @@ es = Elasticsearch(es_url)
 
 @app.route("/")
 def index():
+    if "uid" not in session:
+        session["uid"] = uuid.uuid4()
     session["source"] = random.choice(["a", "b"])
     return render_template("index.html")
 
@@ -52,6 +55,7 @@ def autocomplete():
 
 @app.route("/search", methods=["GET"])
 def search_books():
+    print(session["uid"])
     print(session["source"])
     query = request.args.get("q", "")  # Get the 'q' parameter from the query string
     if not query:
@@ -87,6 +91,7 @@ def select_result():
     selected_isbn = request.form.get("isbn")
     search_terms = request.form.get("searchTerms")
     source = session["source"]
+    uid = str(session["uid"])
     current_time_utc = str(datetime.now(timezone.utc))
 
     # Connect to the SQLite database
@@ -97,8 +102,8 @@ def select_result():
     cursor.execute(
         """
         INSERT INTO selected_books (title, authors, year, source, isbn,
-        searchTerms, selectionTimeUtc)
-        VALUES (?, ?, ?, ?, ?, ?, ?)
+        searchTerms, selectionTimeUtc, uid)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
     """,
         (
             selected_title,
@@ -108,6 +113,7 @@ def select_result():
             selected_isbn,
             search_terms,
             current_time_utc,
+            uid,
         ),
     )
 
