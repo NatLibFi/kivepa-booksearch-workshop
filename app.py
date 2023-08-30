@@ -126,5 +126,32 @@ def select_result():
     return jsonify({"message": "Result selected and saved successfully"})
 
 
+@app.route("/get_selected_books", methods=["GET"])
+def get_selected_books():
+    # Retrieve selected books for the current user (using session or any other user identification method)
+    # You might need to modify this logic based on how you identify users
+    user_selected_books = []
+
+    connection = sqlite3.connect("database.db")
+    cursor = connection.cursor()
+
+    cursor.execute(
+        """
+        SELECT title, authors, source FROM selected_books
+        WHERE uid = ? ORDER BY selectionTimeUtc DESC
+    """,
+        (str(session["uid"]),),
+    )
+
+    rows = cursor.fetchall()
+    for row in rows:
+        title, authors, index = row
+        user_selected_books.append({"title": title, "authors": authors, "index": index.upper()})
+
+    connection.close()
+
+    return jsonify({"selectedBooks": user_selected_books})
+
+
 if __name__ == "__main__":
     app.run(debug=True)
