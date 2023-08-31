@@ -5,8 +5,6 @@ import json
 import requests
 from time import sleep
 
-from annif_client import AnnifClient
-
 
 # Connect to Elasticsearch
 if len(sys.argv) > 1:
@@ -19,10 +17,6 @@ es = Elasticsearch(es_url)
 index_name = "books"
 
 FINTO_API_QUERY_BASE = "https://api.finto.fi/rest/v1/label"
-
-ANNIF_API_BASE = 'https://ai.dev.finto.fi/v1/'
-PROJECT_ID = 'kauno-ensemble-fi'
-annif = AnnifClient(api_base=ANNIF_API_BASE)
 
 
 def parse_book_json(book):
@@ -52,38 +46,40 @@ def resolve_uris_to_labels(uris):
     return labels
 
 
-def annif_suggest(text):
-    results = annif.suggest(project_id=PROJECT_ID, text=text)
-    return [res['uri'] for res in results]
-
-
 # Read books from file
 with gzip.open('ks-bib.json.gz', 'rt') as books_file:
     books = json.loads(books_file.read())["results"]["bindings"]
 print(f"Read {len(books)} books from file")
 
+
+with open('annif-subjects.json', 'rt') as as_file:
+    books_annif_subjects = json.loads(as_file.read())
+print(f"Read annif subjects for {len(books_annif_subjects)} books")
+
+
 actions = []
 loaded_books = set()
 errored = 0
 cnt = 0
-for book in books:
+for book_json in books:
     cnt += 1
     try:
-        document = parse_book_json(book)  # to be imported to Elasticsearch
+        book = parse_book_json(book_json)  # to be imported to Elasticsearch
     except KeyError as err:
         print(f"Key not found: {err}")
         errored += 1
+        continue
 
     # Skip importing duplicates
-    if document["work-uri"] in loaded_books:
+    if book["work-uri"] in loaded_books:
         continue
-    loaded_books.add(document["work-uri"])
+    loaded_books.add(book["work-uri"])
 
-    document["subjects-a-labels"] = resolve_uris_to_labels(document["subjects-a-uris"])
-    document["subjects-b-uris"] = annif_suggest(document["desc"])
-    document["subjects-b-labels"] = resolve_uris_to_labels(document["subjects-b-uris"])
+    book["subjects-a-labels"] = resolve_uris_to_labels(book["subjects-a-uris"])
+    book["subjects-b-uris"] = books_annif_subjects[book["work-uri"]]
+    book["subjects-b-labels"] = resolve_uris_to_labels(book["subjects-b-uris"])
 
-    action = {"_index": index_name, "_source": document}
+    action = {"_index": index_name, "_source": book}
     actions.append(action)
 
     sleep(1)
