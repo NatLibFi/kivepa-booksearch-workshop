@@ -1,4 +1,5 @@
-# kvp-2023 workshop
+# Booksearch workshop application
+An application which is planned to be used at the workshop of automated indexing of fiction books at Kirjastoverkkopäivät 2023.
 
 ## Set up locally
 ### Set up environment:
