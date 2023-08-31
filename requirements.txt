@@ -1,0 +1,4 @@
+annif-client
+flask
+elasticsearch
+requests

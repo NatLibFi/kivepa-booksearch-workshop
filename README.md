@@ -4,7 +4,7 @@
 ### Set up environment:
     python3 -m venv venv
     source venv/bin/activate
-    pip install flask elasticsearch requests
+    pip install -r requirements.txt
 
 ### Set up Elasticsearch
     docker run --rm --net elastic --name es-node01 -p 9200:9200 -p 9300:9300 -e "xpack.security.enabled=false" -e "discovery.type=single-node" -v es-data:/usr/share/elasticsearch/data docker.elastic.co/elasticsearch/elasticsearch:8.9
@@ -26,15 +26,15 @@
 The deploykey for the private repository containing Dockerfile needs to be in place
 ### Install application
     helm upgrade --install kvp-2023-workshop helm-charts/
-    
+
 ### Create indices
-    
+
     # curl -X DELETE "https://kvp-2023-workshop-elasticsearch.apps.kk-test.k8s.it.helsinki.fi:443/boooks"  # Delete old
     # curl -X DELETE "https://kvp-2023-workshop-elasticsearch.apps.kk-test.k8s.it.helsinki.fi:443/labels"  # Delete old
 
     python import-books-to-es.py https://kvp-2023-workshop-elasticsearch.apps.kk-test.k8s.it.helsinki.fi:443
     python create-autocomplete-index.py https://kvp-2023-workshop-elasticsearch.apps.kk-test.k8s.it.helsinki.fi:443
-    
+
     # oc rsh deployment/kvp-2023-workshop-app python -c "from elasticsearch import Elasticsearch; es = Elasticsearch('http://kvp-2023-workshop-elasticsearch:9200'); print(es.indices.get(index='*'))"  # from inside OCP
 
 
