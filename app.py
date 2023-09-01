@@ -138,7 +138,7 @@ def get_selected_books():
     cursor.execute(
         """
         SELECT title, authors, source FROM selected_books
-        WHERE uid = ? ORDER BY selectionTimeUtc DESC
+        WHERE uid = ? ORDER BY selectionTimeUtc ASC
     """,
         (str(session["uid"]),),
     )

@@ -138,6 +138,7 @@
             <table id="selected-books-table" class="selected-books-table">
                 <thead>
                     <tr>
+                        <th>#</th>
                         <th>Title</th>
                         <th>Authors</th>
                         <th>Index</th>
@@ -261,14 +262,19 @@
             const tableBody = document.querySelector('#selected-books-table tbody');
             tableBody.innerHTML = ''; // Clear existing rows
 
+            let rowNumber = 1; // Initialize the row number
+
             data.selectedBooks.forEach(book => {
                 const row = document.createElement('tr');
                 row.innerHTML = `
+                    <td>${rowNumber}</td>
                     <td>${book.title}</td>
                     <td>${book.authors}</td>
                     <td>${book.index}</td>
                 `;
                 tableBody.appendChild(row);
+
+                rowNumber++; // Increment the row number for the next row
             });
         }
 
