@@ -160,15 +160,21 @@
                     $(function () {
                         $("#search-input").autocomplete({
                             source: function (request, response) {
-                                $.ajax({
-                                    url: "/autocomplete",
-                                    data: { q: request.term },
-                                    dataType: "json",
-                                    success: function (data) {
-                                        response(data);
-                                    }
-                                });
-                            }
+                                if (request.term.length >= 3) {
+                                    $.ajax({
+                                        url: "/autocomplete",
+                                        data: { q: request.term },
+                                        dataType: "json",
+                                        success: function (data) {
+                                            response(data);
+                                        }
+                                    });
+                                } else {
+                                    // Clear autocomplete suggestions if input is less than 3 characters
+                                    response([]);
+                                }
+                            },
+                            minLength: 3, // Set the minimum length required to trigger autocomplete
                         });
                     });
                 </script>
