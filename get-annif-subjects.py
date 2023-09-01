@@ -47,14 +47,20 @@ for book_json in books:
     # Skip duplicates
     if book["work-uri"] in books_annif_subjects:
         continue
+    try:
+        book_annif_subjects = annif_suggest(book["desc"])
+    except Exception as err:
+        print(f"annif-suggest error: {err}")
+        continue
 
-    book_annif_subjects = annif_suggest(book["desc"])
     books_annif_subjects[book["work-uri"]] = book_annif_subjects
 
     cnt += 1
-    if cnt >= 200:  # TMP, for getting small dev set
-        break
-    sleep(1)
+    if cnt % 100 == 0:
+        print(f"Suggestions for {cnt} books...")
+        sleep(1)
+    # if cnt >= 100:  # TMP, for getting small dev set
+    #     break
 
 print(f"Saving annif subjects for {len(books_annif_subjects)} books")
 # Save subjects to a file
