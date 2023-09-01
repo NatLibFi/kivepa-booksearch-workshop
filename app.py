@@ -25,10 +25,11 @@ def create_table(cursor):
             title TEXT,
             authors TEXT,
             year INTEGER,
-            labels_set TEXT,
             isbn INTEGER,
-            searchTerms TEXT,
-            selectionTimeUtc TEXT,
+            labels_set TEXT,
+            search_terms TEXT,
+            search_count INT,
+            selection_time_utc TEXT,
             uid TEXT
         )
     """
@@ -40,6 +41,7 @@ def index():
     if "uid" not in session:
         session["uid"] = uuid.uuid4()
     session["labels_set"] = random.choice(["a", "b"])
+    session["search_count"] = 0
     print(f"User {session['uid']}")
     print(f"Using labels set {session['labels_set']}")
     return render_template("index.html")
@@ -76,7 +78,6 @@ def autocomplete():
 
 @app.route("/search", methods=["GET"])
 def search_books():
-
     query = request.args.get("q", "")  # Get the 'q' parameter from the query string
     if not query:
         return jsonify({"error": "Missing 'q' parameter"}), 400
@@ -98,6 +99,8 @@ def search_books():
                 "isbn": 9789512423514,  # TODO Replace with isbn from Elasticsearch
             }
             results.append(result)
+        session["search_count"] += 1
+        print(f"Search count is {session['search_count']}")
         return jsonify({"results": results})
     except Exception as e:
         return jsonify({"error": str(e)}), 500
@@ -109,10 +112,11 @@ def select_result():
     selected_authors = request.form.get("authors")
     selected_year = request.form.get("year")
     selected_isbn = request.form.get("isbn")
-    search_terms = request.form.get("searchTerms")
     used_labels_set = session["labels_set"]
-    uid = str(session["uid"])
+    search_terms = request.form.get("search_terms")
+    search_count = session["search_count"]
     current_time_utc = str(datetime.now(timezone.utc))
+    uid = str(session["uid"])
 
     # Connect to the SQLite database
     connection = sqlite3.connect("database.db")
@@ -123,17 +127,18 @@ def select_result():
     # Insert the selected result into the database
     cursor.execute(
         """
-        INSERT INTO selected_books (title, authors, year, labels_set, isbn,
-        searchTerms, selectionTimeUtc, uid)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        INSERT INTO selected_books (title, authors, year, isbn, labels_set,
+        search_terms, search_count, selection_time_utc, uid)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
     """,
         (
             selected_title,
             selected_authors,
             selected_year,
-            used_labels_set,
             selected_isbn,
+            used_labels_set,
             search_terms,
+            search_count,
             current_time_utc,
             uid,
         ),
@@ -144,6 +149,8 @@ def select_result():
     connection.close()
 
     session["labels-set"] = random.choice(["a", "b"])
+    session["search_count"] = 0
+
     print(f"User {session['uid']}")
     print(f"Using labels set {session['labels_set']}")
     return jsonify({"message": "Result selected and saved successfully"})
@@ -161,16 +168,20 @@ def get_selected_books():
     create_table(cursor)
     cursor.execute(
         """
-        SELECT title, authors, labels_set FROM selected_books
-        WHERE uid = ? ORDER BY selectionTimeUtc ASC
+        SELECT title, authors, labels_set, search_count FROM selected_books
+        WHERE uid = ? ORDER BY selection_time_utc ASC
     """,
         (str(session["uid"]),),
     )
 
     rows = cursor.fetchall()
-    for row in rows:
-        title, authors, labels_set = row
-        user_selected_books.append({"title": title, "authors": authors, "labels_set": labels_set.upper()})
+    for title, authors, labels_set, search_count in rows:
+        user_selected_books.append(
+            {"title": title,
+             "authors": authors,
+             "labels_set": labels_set.upper(),
+             "search_count": search_count,
+        })
 
     connection.close()
 
