@@ -25,7 +25,6 @@ def parse_book_json(book):
     document["subjects-a-uris"] = book["themes"]["value"].split()
     document["title"] = book["title"]["value"]
     document["authors"] = book["authorNames"]["value"]
-    document["desc"] = book["desc"]["value"]
     document["isbn"] = "1234"  # TODO Needs to adjust the SPARQL
     document["year"] = book["pubLabel"]["value"]
     return document
@@ -60,6 +59,7 @@ print(f"Read annif subjects for {len(books_annif_subjects)} books")
 actions = []
 loaded_books = set()
 errored = 0
+skipped = 0
 cnt = 0
 for book_json in books:
     cnt += 1
@@ -72,27 +72,33 @@ for book_json in books:
 
     # Skip importing duplicates
     if book["work-uri"] in loaded_books:
+        skipped += 1
         continue
     loaded_books.add(book["work-uri"])
 
     book["subjects-a-labels"] = resolve_uris_to_labels(book["subjects-a-uris"])
-    book["subjects-b-uris"] = books_annif_subjects[book["work-uri"]]
+    try:
+        book["subjects-b-uris"] = books_annif_subjects[book["work-uri"]]
+    except KeyError as err:
+        print(f"Key not found: {err}")
+        continue
     book["subjects-b-labels"] = resolve_uris_to_labels(book["subjects-b-uris"])
 
     action = {"_index": index_name, "_source": book}
     actions.append(action)
 
-    sleep(1)
-    if cnt >= 200:  # TMP, for getting small dev set
+    if cnt >= 4000:  # TMP, for getting small dev set
         break
 
     if len(actions) >= 100:  # Adjust batch size as needed
         print("Importing 100-documents batch...")
         helpers.bulk(es, actions)
         actions = []
-        print("Done")
+        print(f"Done, number of books imported: {cnt}")
+        sleep(1)
 
 if actions:
     helpers.bulk(es, actions)
 
-print(f"Number of books skipped: {errored}")
+print(f"Number of books errored: {errored}")
+print(f"Number of duplicate books skipped: {skipped}")
