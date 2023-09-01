@@ -16,11 +16,32 @@ es_url = os.getenv("elasticsearch-url", "http://localhost:9200")
 es = Elasticsearch(es_url)
 
 
+def create_table(cursor):
+    # Create a table if it doesn't exist
+    cursor.execute(
+        """
+        CREATE TABLE IF NOT EXISTS selected_books (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            title TEXT,
+            authors TEXT,
+            year INTEGER,
+            labels_set TEXT,
+            isbn INTEGER,
+            searchTerms TEXT,
+            selectionTimeUtc TEXT,
+            uid TEXT
+        )
+    """
+    )
+
+
 @app.route("/")
 def index():
     if "uid" not in session:
         session["uid"] = uuid.uuid4()
-    session["source"] = random.choice(["a", "b"])
+    session["labels_set"] = random.choice(["a", "b"])
+    print(f"User {session['uid']}")
+    print(f"Using labels set {session['labels_set']}")
     return render_template("index.html")
 
 
@@ -55,13 +76,12 @@ def autocomplete():
 
 @app.route("/search", methods=["GET"])
 def search_books():
-    print(session["uid"])
-    print(session["source"])
+
     query = request.args.get("q", "")  # Get the 'q' parameter from the query string
     if not query:
         return jsonify({"error": "Missing 'q' parameter"}), 400
 
-    body = {"query": {"match": {f"subjects-{session['source']}-labels": query}}}
+    body = {"query": {"match": {f"subjects-{session['labels_set']}-labels": query}}}
     # body = {"query": {"fuzzy": {"subjects": {"value": query}}}}
 
     try:
@@ -90,7 +110,7 @@ def select_result():
     selected_year = request.form.get("year")
     selected_isbn = request.form.get("isbn")
     search_terms = request.form.get("searchTerms")
-    source = session["source"]
+    used_labels_set = session["labels_set"]
     uid = str(session["uid"])
     current_time_utc = str(datetime.now(timezone.utc))
 
@@ -98,10 +118,12 @@ def select_result():
     connection = sqlite3.connect("database.db")
     cursor = connection.cursor()
 
+    create_table(cursor)
+
     # Insert the selected result into the database
     cursor.execute(
         """
-        INSERT INTO selected_books (title, authors, year, source, isbn,
+        INSERT INTO selected_books (title, authors, year, labels_set, isbn,
         searchTerms, selectionTimeUtc, uid)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?)
     """,
@@ -109,7 +131,7 @@ def select_result():
             selected_title,
             selected_authors,
             selected_year,
-            source,
+            used_labels_set,
             selected_isbn,
             search_terms,
             current_time_utc,
@@ -121,8 +143,9 @@ def select_result():
     connection.commit()
     connection.close()
 
-    session["source"] = random.choice(["a", "b"])
-
+    session["labels-set"] = random.choice(["a", "b"])
+    print(f"User {session['uid']}")
+    print(f"Using labels set {session['labels_set']}")
     return jsonify({"message": "Result selected and saved successfully"})
 
 
@@ -135,9 +158,10 @@ def get_selected_books():
     connection = sqlite3.connect("database.db")
     cursor = connection.cursor()
 
+    create_table(cursor)
     cursor.execute(
         """
-        SELECT title, authors, source FROM selected_books
+        SELECT title, authors, labels_set FROM selected_books
         WHERE uid = ? ORDER BY selectionTimeUtc ASC
     """,
         (str(session["uid"]),),
@@ -145,8 +169,8 @@ def get_selected_books():
 
     rows = cursor.fetchall()
     for row in rows:
-        title, authors, index = row
-        user_selected_books.append({"title": title, "authors": authors, "index": index.upper()})
+        title, authors, labels_set = row
+        user_selected_books.append({"title": title, "authors": authors, "labels_set": labels_set.upper()})
 
     connection.close()
 
