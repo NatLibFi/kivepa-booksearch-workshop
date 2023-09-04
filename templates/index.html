@@ -154,17 +154,21 @@
             <h2>New Search</h2>
             <!-- Search form and results -->
             <form action="/search" method="get">
-                <input type="text" id="search-input" name="q" placeholder="Enter book subject">
+                <input type="text" id="search-input" name="q" placeholder="Enter book subject(s)">
                 <button type="submit">Search</button>
 
                 <script>
                     $(function () {
-                        $("#search-input").autocomplete({
+                        $("#search-input")
+                        .autocomplete({
+                            minLength: 3,  // Set the minimum length required to trigger autocomplete
                             source: function (request, response) {
+                                const term = extractLast(request.term);
+
                                 if (request.term.length >= 3) {
                                     $.ajax({
                                         url: "/autocomplete",
-                                        data: { q: request.term },
+                                        data: { q: term },
                                         dataType: "json",
                                         success: function (data) {
                                             response(data);
@@ -175,8 +179,30 @@
                                     response([]);
                                 }
                             },
-                            minLength: 3, // Set the minimum length required to trigger autocomplete
+                            focus: function() {
+                                // prevent value inserted on focus
+                                return false;
+                            },
+                            select: function( event, ui ) {
+                                var terms = split( this.value );
+                                // remove the current input
+                                terms.pop();
+                                // add the selected item
+                                terms.push( ui.item.value );
+                                // add placeholder to get the comma-and-space at the end
+                                terms.push( "" );
+                                this.value = terms.join( ", " );
+                                return false;
+                            },
                         });
+
+                        function split( val ) {
+                            return val.split( /,\s*/ );
+                        }
+                        // Function to extract the current term being typed
+                        function extractLast( term ) {
+                            return split( term ).pop();
+                        }
                     });
                 </script>
             </form>

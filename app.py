@@ -82,8 +82,10 @@ def search_books():
     if not query:
         return jsonify({"error": "Missing 'q' parameter"}), 400
 
-    body = {"query": {"match": {f"subjects-{session['labels_set']}-labels": query}}}
-    # body = {"query": {"fuzzy": {"subjects": {"value": query}}}}
+
+    search_terms = query.split(",")
+    search_terms = [t.strip() for t in search_terms if t.strip()]
+    body = {"query": {"terms": {f"subjects-{session['labels_set']}-labels": search_terms}}}
 
     try:
         response = es.search(index="books", body=body)
