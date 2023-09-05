@@ -98,7 +98,7 @@ def search_books():
     }
 
     try:
-        response = es.search(index="books", body=body)
+        response = es.search(index="books", body=body, size=10000)
         hits_count = response["hits"]["total"]["value"]
         hits = response["hits"]["hits"]
         results = []
