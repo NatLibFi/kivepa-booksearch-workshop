@@ -25,3 +25,5 @@ spec:
           env:
             - name: "elasticsearch-url"
               value: "http://{{ .Release.Name }}-elasticsearch:9200"
+  strategy:
+    type: Recreate
