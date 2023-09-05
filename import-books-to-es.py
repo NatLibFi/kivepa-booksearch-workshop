@@ -56,6 +56,27 @@ with open('annif-subjects.json', 'rt') as as_file:
 print(f"Read annif subjects for {len(books_annif_subjects)} books")
 
 
+# Define the index mapping
+index_mapping = {
+    "mappings": {
+        "properties": {
+            "authors": {"work-uri": "text"},
+            "authors": {"type": "text"},
+            "title": {"type": "text"},
+            "isbn": {"type": "text"},
+            "year": {"type": "text"},
+            "subjects-a-uris": {"type": "text"},
+            "subjects-a-labels": {"type": "keyword"},
+            "subjects-b-uris": {"type": "text"},
+            "subjects-b-labels": {"type": "keyword"},
+        }
+    }
+}
+
+# Create the index with the specified mapping
+es.indices.create(index=index_name, body=index_mapping) #, ignore=400)
+
+
 actions = []
 loaded_books = set()
 errored = 0

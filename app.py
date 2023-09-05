@@ -14,6 +14,7 @@ app.config[
 
 es_url = os.getenv("elasticsearch-url", "http://localhost:9200")
 es = Elasticsearch(es_url)
+print(f"Connected to Elasticsearch at: {es_url}")
 
 
 def create_table(cursor):
@@ -82,10 +83,19 @@ def search_books():
     if not query:
         return jsonify({"error": "Missing 'q' parameter"}), 400
 
-
     search_terms = query.split(",")
     search_terms = [t.strip() for t in search_terms if t.strip()]
-    body = {"query": {"terms": {f"subjects-{session['labels_set']}-labels": search_terms}}}
+    search_target_field = f"subjects-{session['labels_set']}-labels"
+    body = {
+        "query": {
+            "terms_set": {
+                search_target_field: {
+                    "terms": search_terms,
+                    "minimum_should_match_script": {"source": "params.num_terms"},
+                }
+            }
+        }
+    }
 
     try:
         response = es.search(index="books", body=body)
@@ -179,11 +189,13 @@ def get_selected_books():
     rows = cursor.fetchall()
     for title, authors, labels_set, search_count in rows:
         user_selected_books.append(
-            {"title": title,
-             "authors": authors,
-             "labels_set": labels_set.upper(),
-             "search_count": search_count,
-        })
+            {
+                "title": title,
+                "authors": authors,
+                "labels_set": labels_set.upper(),
+                "search_count": search_count,
+            }
+        )
 
     connection.close()
 
