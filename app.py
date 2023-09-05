@@ -16,6 +16,8 @@ es_url = os.getenv("elasticsearch-url", "http://localhost:9200")
 es = Elasticsearch(es_url)
 print(f"Connected to Elasticsearch at: {es_url}")
 
+sqlite3_db_path = "/app/sqlite3-data/database.db"
+
 
 def create_table(cursor):
     # Create a table if it doesn't exist
@@ -132,7 +134,7 @@ def select_result():
     uid = str(session["uid"])
 
     # Connect to the SQLite database
-    connection = sqlite3.connect("database.db")
+    connection = sqlite3.connect(sqlite3_db_path)
     cursor = connection.cursor()
 
     create_table(cursor)
@@ -175,7 +177,7 @@ def get_selected_books():
     # You might need to modify this logic based on how you identify users
     user_selected_books = []
 
-    connection = sqlite3.connect("database.db")
+    connection = sqlite3.connect(sqlite3_db_path)
     cursor = connection.cursor()
 
     create_table(cursor)

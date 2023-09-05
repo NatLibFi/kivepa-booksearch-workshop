@@ -10,5 +10,7 @@ USER appuser
 WORKDIR /app
 COPY --chown=appuser:appuser app.py .
 COPY --chown=appuser:appuser templates/ templates/
+RUN mkdir /app/sqlite3-data
+VOLUME /app/sqlite3-data
 
 CMD gunicorn app:app

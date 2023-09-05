@@ -25,5 +25,12 @@ spec:
           env:
             - name: "elasticsearch-url"
               value: "http://{{ .Release.Name }}-elasticsearch:9200"
+          volumeMounts:
+            - name: sqlite-data
+              mountPath: /app/sqlite3-data
+      volumes:
+        - name: sqlite-data
+          persistentVolumeClaim:
+            claimName: {{ .Release.Name }}-sqlite-data
   strategy:
     type: Recreate
