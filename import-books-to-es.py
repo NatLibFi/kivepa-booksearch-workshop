@@ -81,9 +81,10 @@ actions = []
 loaded_books = set()
 errored = 0
 skipped = 0
-cnt = 0
 for book_json in books:
-    cnt += 1
+    if len(loaded_books) >= 4000:  # TMP, for getting small dev set
+        break
+
     try:
         book = parse_book_json(book_json)  # to be imported to Elasticsearch
     except KeyError as err:
@@ -95,7 +96,6 @@ for book_json in books:
     if book["work-uri"] in loaded_books:
         skipped += 1
         continue
-    loaded_books.add(book["work-uri"])
 
     book["subjects-a-labels"] = resolve_uris_to_labels(book["subjects-a-uris"])
     try:
@@ -107,19 +107,19 @@ for book_json in books:
 
     action = {"_index": index_name, "_source": book}
     actions.append(action)
-
-    if cnt >= 4000:  # TMP, for getting small dev set
-        break
+    loaded_books.add(book["work-uri"])
 
     if len(actions) >= 100:  # Adjust batch size as needed
         print("Importing 100-documents batch...")
         helpers.bulk(es, actions)
         actions = []
-        print(f"Done, number of books imported: {cnt}")
+        print(f"Number of books imported: {len(loaded_books)}")
         sleep(1)
 
 if actions:
     helpers.bulk(es, actions)
 
+print("All done.")
+print(f"Number of books imported: {len(loaded_books)}")
 print(f"Number of books errored: {errored}")
 print(f"Number of duplicate books skipped: {skipped}")
