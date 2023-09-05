@@ -33,7 +33,7 @@ The deploykey for the private repository containing the Dockerfile needs to be i
 
 ### Create indices
 
-    # curl -X DELETE "https://kvp-2023-workshop-elasticsearch.apps.kk-test.k8s.it.helsinki.fi:443/boooks"  # Delete old
+    # curl -X DELETE "https://kvp-2023-workshop-elasticsearch.apps.kk-test.k8s.it.helsinki.fi:443/books"  # Delete old
     # curl -X DELETE "https://kvp-2023-workshop-elasticsearch.apps.kk-test.k8s.it.helsinki.fi:443/labels"  # Delete old
 
     python import-books-to-es.py https://kvp-2023-workshop-elasticsearch.apps.kk-test.k8s.it.helsinki.fi:443
@@ -44,10 +44,10 @@ The deploykey for the private repository containing the Dockerfile needs to be i
 
 ## Elasticsearch queries
     curl http://localhost:9200/_aliases
-    curl http://localhost:9200/books?pretty  # Note: returns only
-    curl http://localhost:9200/labels?pretty
-    curl http://localhost:9200/books/_search?pretty | less
-    curl http://localhost:9200/labels/_search?pretty | less
+    curl http://localhost:9200/books?pretty
+    curl http://localhost:9200/books/_count
+    curl http://localhost:9200/books/_search?pretty | less  # Note: returns only 10 results by default
+    
 
 ## TODO How to set up the Apache Jena for data preprocessing
 Needed for running SPARQL query to process the file [kirjasampo-bib.json-ld.gz](https://github.com/NatLibFi/Annif-corpora-restricted/blob/master/kirjasampo/kirjasampo-bib.json-ld.gz).
