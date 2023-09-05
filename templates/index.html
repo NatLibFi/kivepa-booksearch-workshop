@@ -220,7 +220,7 @@
             const response = await fetch(`/search?q=${query}`);
             const data = await response.json();
             const resultsDiv = document.getElementById('results');
-            const totalCount = data.results ? data.results.length : 0; // Get the total count of results
+            const totalCount = data.results_count
             resultsDiv.innerHTML = '';
 
             // Display the total number of results

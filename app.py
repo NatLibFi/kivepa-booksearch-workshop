@@ -99,6 +99,7 @@ def search_books():
 
     try:
         response = es.search(index="books", body=body)
+        hits_count = response["hits"]["total"]["value"]
         hits = response["hits"]["hits"]
         results = []
         for hit in hits:
@@ -113,7 +114,7 @@ def search_books():
             results.append(result)
         session["search_count"] += 1
         print(f"Search count is {session['search_count']}")
-        return jsonify({"results": results})
+        return jsonify({"results_count": hits_count, "results": results})
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
