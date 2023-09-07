@@ -12,7 +12,7 @@ app.config[
     "SESSION_TYPE"
 ] = "filesystem"  # You can also use other session types like 'redis'
 
-es_url = os.getenv("elasticsearch-url", "http://localhost:9200")
+es_url = os.getenv("elasticsearch_url", "http://localhost:9200")
 es = Elasticsearch(es_url)
 print(f"Connected to Elasticsearch at: {es_url}")
 
