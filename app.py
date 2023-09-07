@@ -16,7 +16,7 @@ es_url = os.getenv("elasticsearch-url", "http://localhost:9200")
 es = Elasticsearch(es_url)
 print(f"Connected to Elasticsearch at: {es_url}")
 
-sqlite3_db_path = "/app/sqlite3-data/database.db"
+sqlite3_db_path = "sqlite3-data/database.db"
 
 
 def create_table(cursor):
