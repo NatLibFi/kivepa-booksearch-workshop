@@ -7,6 +7,11 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script> -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -75,7 +80,7 @@
             margin-right: 10px;
         }
 
-        button[type="submit"] {
+        button {
             padding: 8px 15px;
             font-size: 16px;
             background-color: #007bff;
@@ -84,7 +89,7 @@
             border-radius: 4px;
             cursor: pointer;
         }
-        #abandon {
+        #abandon-btn {
             background-color: firebrick;
             color: white;
         }
@@ -210,9 +215,32 @@
                 </script>
             </form>
             <!-- Button to give up searching the book -->
-            <form action="/abandon" class="btn" method="post">
-                <button type="submit" id="abandon">Book cannot be found, proceed to next book!</button>
-            </form>
+            <button type="button" id="abandon-btn" data-toggle="modal" data-target="#abandonModal">
+                Book cannot be found, proceed to next book!
+            </button>
+            <!-- Book abandoning Modal -->
+            <div class="modal fade" id="abandonModal">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <form action="/abandon" method="post">
+                            <div class="modal-header">
+                                <h4 class="modal-title">What book was not found?</h4>
+                                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                            </div>
+                            <div class="modal-body">
+                                <label for="title">Book Title:</label>
+                                <input type="text" id="title" name="title" class="form-control">
+                                <label for="author">Book Author:</label>
+                                <input type="text" id="author" name="author" class="form-control">
+                            </div>
+                            <div class="modal-footer">
+                                <button type="submit">Confirm not-found</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
             <div id="results">
                 <!-- Search results will be displayed here -->
             </div>
