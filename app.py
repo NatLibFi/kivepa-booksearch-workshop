@@ -3,7 +3,7 @@ import sqlite3
 import random
 import uuid
 from datetime import datetime, timezone
-from flask import Flask, request, render_template, jsonify, session
+from flask import Flask, request, render_template, jsonify, session, redirect
 from elasticsearch import Elasticsearch
 
 app = Flask(__name__)
@@ -48,6 +48,13 @@ def index():
     print(f"User {session['uid']}")
     print(f"Using labels set {session['labels_set']}")
     return render_template("index.html")
+
+
+@app.route("/abandon", methods=["POST"])
+def abandon_book():
+    session["labels_set"] = random.choice(["a", "b"])
+    print(f"Using labels set {session['labels_set']}")
+    return redirect("/")
 
 
 @app.route("/autocomplete", methods=["GET"])

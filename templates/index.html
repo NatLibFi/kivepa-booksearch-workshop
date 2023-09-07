@@ -84,7 +84,10 @@
             border-radius: 4px;
             cursor: pointer;
         }
-
+        #abandon {
+            background-color: firebrick;
+            color: white;
+        }
         .total-count {
             /* text-align: center; */
             margin-bottom: 20px;
@@ -150,7 +153,8 @@
             </table>
         </div>
         <div class="right-column">
-            <h2>New Search</h2>
+            <h2>Search</h2>
+
             <!-- Search form and results -->
             <form action="/search" method="get">
                 <input type="text" id="search-input" name="q" placeholder="Enter book subject(s)" size="70">
@@ -204,6 +208,10 @@
                         }
                     });
                 </script>
+            </form>
+            <!-- Button to give up searching the book -->
+            <form action="/abandon" class="btn" method="post">
+                <button type="submit" id="abandon">Book cannot be found, proceed to next book!</button>
             </form>
             <div id="results">
                 <!-- Search results will be displayed here -->
