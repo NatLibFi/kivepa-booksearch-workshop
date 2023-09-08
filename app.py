@@ -50,6 +50,11 @@ def index():
     return render_template("index.html")
 
 
+@app.route("/search-page")
+def search_page():
+    return render_template("search-page.html")
+
+
 @app.route("/abandon", methods=["POST"])
 def abandon_book():
     title = request.form.get("title")
