@@ -13,11 +13,12 @@ h1 {
 
 h2 {
     text-align: center;
+    margin: 20px 0;
 }
 
 /* For index page */
 .centering-col {
-padding: 20px; /* Add some padding for spacing */
+padding: 0 20px; /* Add some padding for spacing */
 display: flex;
 flex-direction: column;
 align-items: center;
@@ -25,16 +26,16 @@ justify-content: center;
 height: 100%; /* Ensure the column takes up the full height */
 }
 
-/* For search page */
 /* Style for the container holding the two columns */
 .container {
     display: flex;
     justify-content: space-between;
     max-width: 1200px;
     margin: 0 auto;
-    padding: 20px;
+    padding: 0 20px;
 }
 
+/* For search page */
 /* Style for the left column (selected books table) */
 .left-column {
     flex: 1;
@@ -49,7 +50,6 @@ height: 100%; /* Ensure the column takes up the full height */
 .selected-books-table {
     width: 100%;
     border-collapse: collapse;
-    margin-top: 20px;
 }
 
 .selected-books-table th,
