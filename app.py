@@ -6,6 +6,7 @@ from datetime import datetime, timezone
 from flask import Flask, request, render_template, jsonify, session, redirect
 from elasticsearch import Elasticsearch
 
+
 app = Flask(__name__)
 app.secret_key = "super secret key"
 app.config[
@@ -43,15 +44,16 @@ def create_table(cursor):
 def index():
     if "uid" not in session:
         session["uid"] = uuid.uuid4()
-    session["labels_set"] = random.choice(["a", "b"])
-    session["search_count"] = 0
     print(f"User {session['uid']}")
-    print(f"Using labels set {session['labels_set']}")
     return render_template("index.html")
 
 
 @app.route("/search-page")
 def search_page():
+    labels_set = request.args.get('labels')
+    session["labels_set"] = labels_set
+    session["search_count"] = 0
+    print(f"Using labels set {session['labels_set']}")
     return render_template("search-page.html")
 
 
