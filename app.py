@@ -62,10 +62,8 @@ def abandon_book():
     title = request.form.get("title")
     author = request.form.get("author")
     print(f"Book not found: {author} - {title}")
-
-    session["labels_set"] = random.choice(["a", "b"])
-    print(f"Using labels set {session['labels_set']}")
-    return redirect("/")
+    # The used labels set needs to be retained
+    return redirect("/search-page?labels="+session["labels_set"])
 
 
 @app.route("/autocomplete", methods=["GET"])
