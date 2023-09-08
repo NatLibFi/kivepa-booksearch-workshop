@@ -48,22 +48,20 @@ def index():
     return render_template("index.html")
 
 
-@app.route("/search-page")
-def search_page():
-    labels_set = request.args.get('labels')
-    session["labels_set"] = labels_set
+@app.route("/<labels_set>/search_page")
+def search_page_fn(labels_set):
     session["search_count"] = 0
-    print(f"Using labels set {session['labels_set']}")
     return render_template("search-page.html")
 
 
-@app.route("/abandon", methods=["POST"])
-def abandon_book():
+@app.route("/<labels_set>/abandon", methods=["POST"])
+def abandon_fn(labels_set):
     title = request.form.get("title")
     author = request.form.get("author")
     print(f"Book not found: {author} - {title}")
     # The used labels set needs to be retained
-    return redirect("/search-page?labels="+session["labels_set"])
+    print(labels_set)
+    return redirect(f"/{labels_set}/search_page")
 
 
 @app.route("/autocomplete", methods=["GET"])
@@ -95,15 +93,16 @@ def autocomplete():
     return jsonify(suggestion_values)
 
 
-@app.route("/search", methods=["GET"])
-def search_books():
+@app.route("/<labels_set>/search", methods=["GET"])
+def search_fn(labels_set):
+    print(labels_set)
     query = request.args.get("q", "")  # Get the 'q' parameter from the query string
     if not query:
         return jsonify({"error": "Missing 'q' parameter"}), 400
 
     search_terms = query.split(",")
     search_terms = [t.strip() for t in search_terms if t.strip()]
-    search_target_field = f"subjects-{session['labels_set']}-labels"
+    search_target_field = f"subjects-{labels_set}-labels"
     body = {
         "query": {
             "terms_set": {
@@ -137,13 +136,13 @@ def search_books():
         return jsonify({"error": str(e)}), 500
 
 
-@app.route("/select", methods=["POST"])
-def select_result():
+@app.route("/<labels_set>/select", methods=["POST"])
+def select_fn(labels_set):
     selected_title = request.form.get("title")
     selected_authors = request.form.get("authors")
     selected_year = request.form.get("year")
     selected_isbn = request.form.get("isbn")
-    used_labels_set = session["labels_set"]
+    used_labels_set = labels_set
     search_terms = request.form.get("search_terms")
     search_count = session["search_count"]
     current_time_utc = str(datetime.now(timezone.utc))
@@ -179,18 +178,13 @@ def select_result():
     connection.commit()
     connection.close()
 
-    session["labels-set"] = random.choice(["a", "b"])
     session["search_count"] = 0
-
-    print(f"User {session['uid']}")
-    print(f"Using labels set {session['labels_set']}")
     return jsonify({"message": "Result selected and saved successfully"})
 
 
 @app.route("/get_selected_books", methods=["GET"])
 def get_selected_books():
     # Retrieve selected books for the current user (using session or any other user identification method)
-    # You might need to modify this logic based on how you identify users
     user_selected_books = []
 
     connection = sqlite3.connect(sqlite3_db_path)
