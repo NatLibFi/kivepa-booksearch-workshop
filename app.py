@@ -1,6 +1,5 @@
 import os
 import sqlite3
-import random
 import uuid
 from datetime import datetime, timezone
 from flask import Flask, request, render_template, jsonify, session, redirect
@@ -60,7 +59,6 @@ def abandon_fn(labels_set):
     author = request.form.get("author")
     print(f"Book not found: {author} - {title}")
     # The used labels set needs to be retained
-    print(labels_set)
     return redirect(f"/{labels_set}/search_page")
 
 
@@ -182,9 +180,9 @@ def select_fn(labels_set):
     return jsonify({"message": "Result selected and saved successfully"})
 
 
-@app.route("/get_selected_books", methods=["GET"])
-def get_selected_books():
-    # Retrieve selected books for the current user (using session or any other user identification method)
+@app.route("/<labels_set>/get_selected_books", methods=["GET"])
+def get_selected_books_fn(labels_set):
+    # Retrieve selected books for the current user and labels set
     user_selected_books = []
 
     connection = sqlite3.connect(sqlite3_db_path)
@@ -194,9 +192,9 @@ def get_selected_books():
     cursor.execute(
         """
         SELECT title, authors, labels_set, search_count FROM selected_books
-        WHERE uid = ? ORDER BY selection_time_utc ASC
+        WHERE uid = ? AND labels_set = ? ORDER BY selection_time_utc ASC
     """,
-        (str(session["uid"]),),
+        (str(session["uid"]), labels_set),
     )
 
     rows = cursor.fetchall()

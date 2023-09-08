@@ -10,6 +10,7 @@
     <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script> -->
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <link rel="stylesheet" href="/static/styles.css">
+    <script src="/static/table.js"></script>
 </head>
 
 <body>
@@ -21,25 +22,13 @@
     </div>
     <div class="container">
         <div class="left-column">
-            <!-- Selected books table -->
             <h2>Selected Books</h2>
-            <table id="selected-books-table" class="selected-books-table">
-                <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>Title</th>
-                        <th>Authors</th>
-                        <th>Labels</th>
-                        <th>Search count</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <!-- Selected books will be displayed here -->
-                </tbody>
-            </table>
+            <!-- Selected books table -->
+            <table id="selected-books-table-{{ request.view_args['labels_set'] }}" class="selected-books-table"></table>
         </div>
         <div class="right-column">
-            <h2 id="labels-heading">Search from labels <span style="text-transform:uppercase">{{ request.view_args['labels_set'] }}</span></h2>
+            <h2 id="labels-heading">Search from labels <span style="text-transform:uppercase">{{
+                    request.view_args['labels_set'] }}</span></h2>
 
             <!-- Search form and results -->
             <form action="{{ url_for('search_fn', labels_set=request.view_args['labels_set']) }}" method="get">
@@ -49,48 +38,48 @@
                 <script>
                     $(function () {
                         $("#search-input")
-                        .autocomplete({
-                            minLength: 3,  // Set the minimum length required to trigger autocomplete
-                            source: function (request, response) {
-                                const term = extractLast(request.term);
+                            .autocomplete({
+                                minLength: 3,  // Set the minimum length required to trigger autocomplete
+                                source: function (request, response) {
+                                    const term = extractLast(request.term);
 
-                                if (request.term.length >= 3) {
-                                    $.ajax({
-                                        url: "/autocomplete",
-                                        data: { q: term },
-                                        dataType: "json",
-                                        success: function (data) {
-                                            response(data);
-                                        }
-                                    });
-                                } else {
-                                    // Clear autocomplete suggestions if input is less than 3 characters
-                                    response([]);
-                                }
-                            },
-                            focus: function() {
-                                // prevent value inserted on focus
-                                return false;
-                            },
-                            select: function( event, ui ) {
-                                var terms = split( this.value );
-                                // remove the current input
-                                terms.pop();
-                                // add the selected item
-                                terms.push( ui.item.value );
-                                // add placeholder to get the comma-and-space at the end
-                                terms.push( "" );
-                                this.value = terms.join( ", " );
-                                return false;
-                            },
-                        });
+                                    if (request.term.length >= 3) {
+                                        $.ajax({
+                                            url: "/autocomplete",
+                                            data: { q: term },
+                                            dataType: "json",
+                                            success: function (data) {
+                                                response(data);
+                                            }
+                                        });
+                                    } else {
+                                        // Clear autocomplete suggestions if input is less than 3 characters
+                                        response([]);
+                                    }
+                                },
+                                focus: function () {
+                                    // prevent value inserted on focus
+                                    return false;
+                                },
+                                select: function (event, ui) {
+                                    var terms = split(this.value);
+                                    // remove the current input
+                                    terms.pop();
+                                    // add the selected item
+                                    terms.push(ui.item.value);
+                                    // add placeholder to get the comma-and-space at the end
+                                    terms.push("");
+                                    this.value = terms.join(", ");
+                                    return false;
+                                },
+                            });
 
-                        function split( val ) {
-                            return val.split( /,\s*/ );
+                        function split(val) {
+                            return val.split(/,\s*/);
                         }
                         // Function to extract the current term being typed
-                        function extractLast( term ) {
-                            return split( term ).pop();
+                        function extractLast(term) {
+                            return split(term).pop();
                         }
                     });
                 </script>
@@ -103,7 +92,8 @@
             <div class="modal fade" id="abandonModal">
                 <div class="modal-dialog">
                     <div class="modal-content">
-                        <form action="{{ url_for('abandon_fn', labels_set=request.view_args['labels_set']) }}" method="post">
+                        <form action="{{ url_for('abandon_fn', labels_set=request.view_args['labels_set']) }}"
+                            method="post">
                             <div class="modal-header">
                                 <h4 class="modal-title">What book was not found?</h4>
                                 <button type="button" class="close" data-dismiss="modal">&times;</button>
@@ -179,7 +169,7 @@
                     document.getElementById('results').innerHTML = '';
                     // Clear the search input field
                     document.querySelector('#search-input').value = '';
-                    await fetchSelectedBooks();
+                    await populateSelectedBooksTable("{{ request.view_args['labels_set'] }}");
                 });
             });
 
@@ -203,33 +193,11 @@
             });
         }
 
-        // Function to fetch and display selected books
-        async function fetchSelectedBooks() {
-            const response = await fetch('/get_selected_books');
-            const data = await response.json();
-
-            const tableBody = document.querySelector('#selected-books-table tbody');
-            tableBody.innerHTML = ''; // Clear existing rows
-
-            let rowNumber = 1; // Initialize the row number
-
-            data.selectedBooks.forEach(book => {
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>${rowNumber}</td>
-                    <td>${book.title}</td>
-                    <td>${book.authors}</td>
-                    <td>${book.labels_set}</td>
-                    <td>${book.search_count}</td>
-                `;
-                tableBody.appendChild(row);
-
-                rowNumber++; // Increment the row number for the next row
-            });
-        }
-
-        // Fetch and display selected books when the page loads
-        window.addEventListener('load', fetchSelectedBooks);
+        $(document).ready(function () {
+            $(".selected-books-table").load('/static/table.html');
+            // Fetch and display selected books when the page loads
+            populateSelectedBooksTable("{{ request.view_args['labels_set'] }}");
+        });
     </script>
 </body>
 
