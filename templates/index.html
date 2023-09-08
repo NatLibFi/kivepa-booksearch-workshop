@@ -3,7 +3,6 @@
 
 <head>
     <title>Books Search</title>
-    <!-- Include jQuery and jQuery UI -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
@@ -77,9 +76,8 @@
             font-size: 16px;
             border: 1px solid #ccc;
             border-radius: 4px;
-            margin-right: 10px;
+            margin-right: 0px;
         }
-
         button {
             padding: 8px 15px;
             font-size: 16px;
@@ -89,12 +87,18 @@
             border-radius: 4px;
             cursor: pointer;
         }
+        #search-btn {
+            margin-left: 0;
+        }
         #abandon-btn {
+            display: block;
+            margin: 0 auto;
             background-color: firebrick;
             color: white;
         }
         .total-count {
-            /* text-align: center; */
+            text-align: center;
+            margin-top: 20px;
             margin-bottom: 20px;
         }
 
@@ -260,7 +264,7 @@
             resultsDiv.innerHTML = '';
 
             // Display the total number of results
-            const totalCountDiv = document.createElement('div');
+            const totalCountDiv = document.createElement('h3');
             totalCountDiv.classList.add('total-count');
             totalCountDiv.textContent = `Total Results: ${totalCount}`;
             resultsDiv.appendChild(totalCountDiv);
