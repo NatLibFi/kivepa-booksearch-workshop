@@ -23,7 +23,7 @@ spec:
             image-registry.openshift-image-registry.svc:5000/annif/{{ .Release.Name }}-app:latest
           command: ["gunicorn", "app:app", "--bind", "0.0.0.0:8000"]
           env:
-            - name: "elasticsearch_url"
+            - name: "ELASTICSEARCH_URL"
               value: "http://{{ .Release.Name }}-elasticsearch:9200"
           volumeMounts:
             - name: sqlite-data
