@@ -2,9 +2,9 @@ import os
 import sqlite3
 import uuid
 from datetime import datetime, timezone
-from flask import Flask, request, render_template, jsonify, session, redirect
-from elasticsearch import Elasticsearch
 
+from elasticsearch import Elasticsearch
+from flask import Flask, jsonify, redirect, render_template, request, session
 
 app = Flask(__name__)
 app.secret_key = "super secret key"
@@ -94,7 +94,7 @@ def autocomplete():
 @app.route("/<labels_set>/search", methods=["GET"])
 def search_fn(labels_set):
     print(labels_set)
-    query = request.args.get("q", "")  # Get the 'q' parameter from the query string
+    query = request.args.get("q", "")
     if not query:
         return jsonify({"error": "Missing 'q' parameter"}), 400
 
@@ -124,7 +124,7 @@ def search_fn(labels_set):
                 "authors": source.get("authors", "N/A"),
                 "year": source.get("year", "N/A"),
                 "score": hit["_score"],
-                "isbn": 9789512423514,  # TODO Replace with isbn from Elasticsearch
+                "isbn": 9789512423514,  # TODO Replace with real isbn
             }
             results.append(result)
         session["search_count"] += 1

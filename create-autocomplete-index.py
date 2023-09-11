@@ -1,4 +1,5 @@
 import sys
+
 from elasticsearch import Elasticsearch, helpers
 
 # Get all unique labels from two fields of an existing index

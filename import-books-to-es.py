@@ -1,10 +1,10 @@
-from elasticsearch import Elasticsearch, helpers
 import gzip
-import sys
 import json
-import requests
+import sys
 from time import sleep
 
+import requests
+from elasticsearch import Elasticsearch, helpers
 
 # Connect to Elasticsearch
 if len(sys.argv) > 1:
@@ -46,12 +46,12 @@ def resolve_uris_to_labels(uris):
 
 
 # Read books from file
-with gzip.open('ks-bib.json.gz', 'rt') as books_file:
+with gzip.open("ks-bib.json.gz", "rt") as books_file:
     books = json.loads(books_file.read())["results"]["bindings"]
 print(f"Read {len(books)} books from file")
 
 
-with open('annif-subjects.json', 'rt') as as_file:
+with open("annif-subjects.json", "rt") as as_file:
     books_annif_subjects = json.loads(as_file.read())
 print(f"Read annif subjects for {len(books_annif_subjects)} books")
 
@@ -60,7 +60,7 @@ print(f"Read annif subjects for {len(books_annif_subjects)} books")
 index_mapping = {
     "mappings": {
         "properties": {
-            "authors": {"work-uri": "text"},
+            "work-uri": {"work-uri": "text"},
             "authors": {"type": "text"},
             "title": {"type": "text"},
             "isbn": {"type": "text"},
@@ -74,7 +74,7 @@ index_mapping = {
 }
 
 # Create the index with the specified mapping
-es.indices.create(index=index_name, body=index_mapping) #, ignore=400)
+es.indices.create(index=index_name, body=index_mapping)  # , ignore=400)
 
 
 actions = []
@@ -82,7 +82,7 @@ loaded_books = set()
 errored = 0
 skipped = 0
 for book_json in books:
-    if len(loaded_books) >= 4000:  # TMP, for getting small dev set
+    if len(loaded_books) >= 8000:  # TMP, for getting small dev set
         break
 
     try:
