@@ -70,60 +70,53 @@
     <script src="/static/table.js"></script>
 
     <script>
-        document.querySelector('form').addEventListener('submit', async (event) => {
+        $('form').on('submit', async function (event) {
             event.preventDefault();
-            const coverImageUrl = "https://www.finna.fi/Cover/Show?source=Solr&invisbn="
+            const coverImageUrl = "https://www.finna.fi/Cover/Show?source=Solr&invisbn=";
 
-            const query = document.querySelector('input[name="q"]').value;
+            const query = $('input[name="q"]').val();
             const response = await fetch("{{ url_for('search_fn', labels_set=request.view_args['labels_set']) }}" + `?q=${query}`);
             const data = await response.json();
-            const resultsDiv = document.getElementById('results');
-            const totalCount = data.results_count
-            resultsDiv.innerHTML = '';
+            const resultsDiv = $('#results');
+            const totalCount = data.results_count;
+            resultsDiv.empty();
 
             // Display the total number of results
-            const totalCountDiv = document.createElement('h3');
-            totalCountDiv.classList.add('total-count');
-            totalCountDiv.textContent = `Total Results: ${totalCount}`;
-            resultsDiv.appendChild(totalCountDiv);
+            const totalCountDiv = $('<h3>').addClass('total-count').text(`Total Results: ${totalCount}`);
+            resultsDiv.append(totalCountDiv);
 
             if (data.results) {
                 data.results.forEach(result => {
-                    const resultDiv = document.createElement('div');
-                    resultDiv.classList.add('result'); // Add the result class
-                    resultDiv.innerHTML = `
-                    <img src="${coverImageUrl}${result.isbn}" alt="Cover Image" class="book-cover">
-                    <div class="result-details">
-                        <p><strong>Title:</strong> ${result.title}</p>
-                        <p><strong>Authors:</strong> ${result.authors}</p>
-                        <p><strong>Year:</strong> ${result.year}</p>
-                        <p><strong>ISBN:</strong> ${result.isbn}</p>
-                        <button class="select-btn" data-title="${result.title}" data-authors="${result.authors}" data-year="${result.year}" data-isbn="${result.isbn}">Select and new search</button>
-                    </div>
-                `;
-                    resultsDiv.appendChild(resultDiv);
+                    const resultDiv = $('<div>').addClass('result');
+                    resultDiv.html(`
+                        <img src="${coverImageUrl}${result.isbn}" alt="Cover Image" class="book-cover">
+                        <div class="result-details">
+                            <p><strong>Title:</strong> ${result.title}</p>
+                            <p><strong>Authors:</strong> ${result.authors}</p>
+                            <p><strong>Year:</strong> ${result.year}</p>
+                            <p><strong>ISBN:</strong> ${result.isbn}</p>
+                            <button class="select-btn" data-title="${result.title}" data-authors="${result.authors}" data-year="${result.year}" data-isbn="${result.isbn}">Select and new search</button>
+                        </div>
+                    `);
+                    resultsDiv.append(resultDiv);
                 });
             } else {
-                resultsDiv.innerHTML = '<p>No results found.</p>';
+                resultsDiv.html('<p>No results found.</p>');
             }
 
             // Attach event listeners to the "Select" buttons
-            const selectButtons = document.querySelectorAll('.select-btn');
-            selectButtons.forEach(button => {
-                button.addEventListener('click', async () => {
-                    const selectedTitle = button.getAttribute('data-title');
-                    const selectedAuthors = button.getAttribute('data-authors');
-                    const selectedYear = button.getAttribute('data-year');
-                    const selectedISBN = button.getAttribute('data-isbn');
-                    await submitSelectedResult(selectedTitle, selectedAuthors, selectedYear, selectedISBN, query);
-                    // Clear search results
-                    document.getElementById('results').innerHTML = '';
-                    // Clear the search input field
-                    document.querySelector('#search-input').value = '';
-                    await populateSelectedBooksTable("{{ request.view_args['labels_set'] }}");
-                });
+            $('.select-btn').on('click', async function () {
+                const selectedTitle = $(this).data('title');
+                const selectedAuthors = $(this).data('authors');
+                const selectedYear = $(this).data('year');
+                const selectedISBN = $(this).data('isbn');
+                await submitSelectedResult(selectedTitle, selectedAuthors, selectedYear, selectedISBN, query);
+                // Clear search results
+                $('#results').empty();
+                // Clear the search input field
+                $('#search-input').val('');
+                await populateSelectedBooksTable("{{ request.view_args['labels_set'] }}");
             });
-
         });
 
         async function submitSelectedResult(title, authors, year, isbn, searchTerms) {
