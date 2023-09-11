@@ -1,7 +1,7 @@
 FROM quay.io/juhoinkinen/python:3.8-slim-bookworm
 
 
-RUN apt-get update && apt-get upgrade && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get upgrade -y && rm -rf /var/lib/apt/lists/*
 RUN pip install --upgrade pip setuptools wheel flask elasticsearch requests gunicorn
 
 RUN groupadd -r appuser && useradd -r -g appuser appuser
