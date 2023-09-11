@@ -3,14 +3,9 @@
 
 <head>
     <title>Books Search</title>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
-    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script> -->
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <link rel="stylesheet" href="static/styles.css">
-    <script src="/static/table.js"></script>
 </head>
 
 <body>
@@ -31,14 +26,20 @@
             </div>
         </div>
     </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="/static/table.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            $(".selected-books-table").load('/static/table.html');
+            // Fetch and display selected books when the page loads
+            populateSelectedBooksTable('a');
+            populateSelectedBooksTable('b');
+        });
+    </script>
 </body>
-<script>
-    $(document).ready(function () {
-        $(".selected-books-table").load('/static/table.html');
-        // Fetch and display selected books when the page loads
-        populateSelectedBooksTable('a');
-        populateSelectedBooksTable('b');
-    });
-</script>
 
 </html>

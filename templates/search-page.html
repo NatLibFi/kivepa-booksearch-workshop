@@ -3,14 +3,9 @@
 
 <head>
     <title>Books Search</title>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
-    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script> -->
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <link rel="stylesheet" href="/static/styles.css">
-    <script src="/static/table.js"></script>
 </head>
 
 <body>
@@ -34,55 +29,6 @@
             <form action="{{ url_for('search_fn', labels_set=request.view_args['labels_set']) }}" method="get">
                 <input type="text" id="search-input" name="q" placeholder="Enter book subject(s)" size="70">
                 <button type="submit">Search</button>
-
-                <script>
-                    $(function () {
-                        $("#search-input")
-                            .autocomplete({
-                                minLength: 3,  // Set the minimum length required to trigger autocomplete
-                                source: function (request, response) {
-                                    const term = extractLast(request.term);
-
-                                    if (request.term.length >= 3) {
-                                        $.ajax({
-                                            url: "/autocomplete",
-                                            data: { q: term },
-                                            dataType: "json",
-                                            success: function (data) {
-                                                response(data);
-                                            }
-                                        });
-                                    } else {
-                                        // Clear autocomplete suggestions if input is less than 3 characters
-                                        response([]);
-                                    }
-                                },
-                                focus: function () {
-                                    // prevent value inserted on focus
-                                    return false;
-                                },
-                                select: function (event, ui) {
-                                    var terms = split(this.value);
-                                    // remove the current input
-                                    terms.pop();
-                                    // add the selected item
-                                    terms.push(ui.item.value);
-                                    // add placeholder to get the comma-and-space at the end
-                                    terms.push("");
-                                    this.value = terms.join(", ");
-                                    return false;
-                                },
-                            });
-
-                        function split(val) {
-                            return val.split(/,\s*/);
-                        }
-                        // Function to extract the current term being typed
-                        function extractLast(term) {
-                            return split(term).pop();
-                        }
-                    });
-                </script>
             </form>
             <!-- Button to give up searching the book -->
             <button type="button" id="abandon-btn" data-toggle="modal" data-target="#abandonModal">
@@ -117,6 +63,11 @@
             </div>
         </div>
     </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="/static/table.js"></script>
 
     <script>
         document.querySelector('form').addEventListener('submit', async (event) => {
@@ -193,11 +144,59 @@
             });
         }
 
+        function split(val) {
+            return val.split(/,\s*/);
+        }
+
+        // Function to extract the current term being typed
+        function extractLast(term) {
+            return split(term).pop();
+        }
+
         $(document).ready(function () {
             $(".selected-books-table").load('/static/table.html');
             // Fetch and display selected books when the page loads
             populateSelectedBooksTable("{{ request.view_args['labels_set'] }}");
+
+            $("#search-input")
+                .autocomplete({
+                    minLength: 3,  // Set the minimum length required to trigger autocomplete
+                    source: function (request, response) {
+                        const term = extractLast(request.term);
+
+                        if (request.term.length >= 3) {
+                            $.ajax({
+                                url: "/autocomplete",
+                                data: { q: term },
+                                dataType: "json",
+                                success: function (data) {
+                                    response(data);
+                                }
+                            });
+                        } else {
+                            // Clear autocomplete suggestions if input is less than 3 characters
+                            response([]);
+                        }
+                    },
+                    focus: function () {
+                        // prevent value inserted on focus
+                        return false;
+                    },
+                    select: function (event, ui) {
+                        var terms = split(this.value);
+                        // remove the current input
+                        terms.pop();
+                        // add the selected item
+                        terms.push(ui.item.value);
+                        // add placeholder to get the comma-and-space at the end
+                        terms.push("");
+                        this.value = terms.join(", ");
+                        return false;
+                    },
+                });
+
         });
+
     </script>
 </body>
 
