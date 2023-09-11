@@ -18,7 +18,8 @@ An application which is planned to be used at the workshop of automated indexing
 
     # curl -X DELETE "localhost:9200/labels"  # Delete existing index
     python create-autocomplete-index.py
-
+#### Alternatively use Elasticsearch running in OpenShift
+    export ELASTICSEARCH_URL=https://kvp-2023-workshop-elasticsearch.apps.kk-test.k8s.it.helsinki.fi:443
 ### Start application
     flask run --debug
     # gunicorn app:app  # Alternatively use gunicorn
