@@ -137,10 +137,10 @@ def search_fn(labels_set):
 
 @app.route("/<labels_set>/select", methods=["POST"])
 def select_fn(labels_set):
-    selected_title = request.form.get("title")
-    selected_authors = request.form.get("authors")
-    selected_year = request.form.get("year")
-    selected_isbn = request.form.get("isbn")
+    title = request.form.get("title")
+    authors = request.form.get("authors")
+    year = request.form.get("year")
+    isbn = request.form.get("isbn")
     used_labels_set = labels_set
     search_count = session["search_count"]
     search_terms = request.form.get("search_terms")
@@ -149,44 +149,40 @@ def select_fn(labels_set):
     uid = str(session["uid"])
 
     # Connect to the SQLite database
-    connection = sqlite3.connect(sqlite3_db_path)
-    cursor = connection.cursor()
+    with sqlite3.connect(sqlite3_db_path) as connection:
+        cursor = connection.cursor()
+        # Create the table if it doesn't exist
+        create_table(cursor)
 
-    create_table(cursor)
-
-    # Insert the selected result into the database
-    cursor.execute(
-        """
-        INSERT INTO selected_books (
-            title,
-            authors,
-            year,
-            isbn,
-            labels_set,
-            search_terms,
-            search_count,
-            search_begin_time_utc,
-            search_end_time_utc,
-            uid)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    """,
-        (
-            selected_title,
-            selected_authors,
-            selected_year,
-            selected_isbn,
-            used_labels_set,
-            search_terms,
-            search_count,
-            search_begin_time_utc,
-            search_end_time_utc,
-            uid,
-        ),
-    )
-
-    # Commit the changes and close the connection
-    connection.commit()
-    connection.close()
+        # Insert the selected result into the database
+        cursor.execute(
+            """
+            INSERT INTO selected_books (
+                title,
+                authors,
+                year,
+                isbn,
+                labels_set,
+                search_terms,
+                search_count,
+                search_begin_time_utc,
+                search_end_time_utc,
+                uid)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        """,
+            (
+                title,
+                authors,
+                year,
+                isbn,
+                used_labels_set,
+                search_terms,
+                search_count,
+                search_begin_time_utc,
+                search_end_time_utc,
+                uid,
+            ),
+        )
 
     session["search_count"] = 0
     return jsonify({"message": "Result selected and saved successfully"})
@@ -197,30 +193,28 @@ def get_selected_books_fn(labels_set):
     # Retrieve selected books for the current user and labels set
     user_selected_books = []
 
-    connection = sqlite3.connect(sqlite3_db_path)
-    cursor = connection.cursor()
+    with sqlite3.connect(sqlite3_db_path) as connection:
+        cursor = connection.cursor()
 
-    create_table(cursor)
-    cursor.execute(
-        """
-        SELECT title, authors, labels_set, search_count FROM selected_books
-        WHERE uid = ? AND labels_set = ? ORDER BY search_end_time_utc ASC
-    """,
-        (str(session["uid"]), labels_set),
-    )
-
-    rows = cursor.fetchall()
-    for title, authors, labels_set, search_count in rows:
-        user_selected_books.append(
-            {
-                "title": title,
-                "authors": authors,
-                "labels_set": labels_set.upper(),
-                "search_count": search_count,
-            }
+        create_table(cursor)
+        cursor.execute(
+            """
+            SELECT title, authors, labels_set, search_count FROM selected_books
+            WHERE uid = ? AND labels_set = ? ORDER BY search_end_time_utc ASC
+        """,
+            (str(session["uid"]), labels_set),
         )
 
-    connection.close()
+        rows = cursor.fetchall()
+        for title, authors, labels_set, search_count in rows:
+            user_selected_books.append(
+                {
+                    "title": title,
+                    "authors": authors,
+                    "labels_set": labels_set.upper(),
+                    "search_count": search_count,
+                }
+            )
 
     return jsonify({"selectedBooks": user_selected_books})
 
