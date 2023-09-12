@@ -1,7 +1,6 @@
 import os
 import sqlite3
 import uuid
-from datetime import datetime, timezone
 
 from elasticsearch import Elasticsearch
 from flask import Flask, jsonify, redirect, render_template, request, session
@@ -30,9 +29,11 @@ def create_table(cursor):
             year INTEGER,
             isbn INTEGER,
             labels_set TEXT,
-            search_terms TEXT,
             search_count INT,
-            selection_time_utc TEXT,
+            search_terms TEXT,
+            search_begin_time_utc TEXT,
+            search_end_time_utc TEXT,
+            abandonment_time_utc TEXT,
             uid TEXT
         )
     """
@@ -141,9 +142,10 @@ def select_fn(labels_set):
     selected_year = request.form.get("year")
     selected_isbn = request.form.get("isbn")
     used_labels_set = labels_set
-    search_terms = request.form.get("search_terms")
     search_count = session["search_count"]
-    current_time_utc = str(datetime.now(timezone.utc))
+    search_terms = request.form.get("search_terms")
+    search_begin_time_utc = request.form.get("search_begin_time_utc")
+    search_end_time_utc = request.form.get("search_end_time_utc")
     uid = str(session["uid"])
 
     # Connect to the SQLite database
@@ -155,9 +157,18 @@ def select_fn(labels_set):
     # Insert the selected result into the database
     cursor.execute(
         """
-        INSERT INTO selected_books (title, authors, year, isbn, labels_set,
-        search_terms, search_count, selection_time_utc, uid)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+        INSERT INTO selected_books (
+            title,
+            authors,
+            year,
+            isbn,
+            labels_set,
+            search_terms,
+            search_count,
+            search_begin_time_utc,
+            search_end_time_utc,
+            uid)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     """,
         (
             selected_title,
@@ -167,7 +178,8 @@ def select_fn(labels_set):
             used_labels_set,
             search_terms,
             search_count,
-            current_time_utc,
+            search_begin_time_utc,
+            search_end_time_utc,
             uid,
         ),
     )
@@ -192,7 +204,7 @@ def get_selected_books_fn(labels_set):
     cursor.execute(
         """
         SELECT title, authors, labels_set, search_count FROM selected_books
-        WHERE uid = ? AND labels_set = ? ORDER BY selection_time_utc ASC
+        WHERE uid = ? AND labels_set = ? ORDER BY search_end_time_utc ASC
     """,
         (str(session["uid"]), labels_set),
     )

@@ -28,6 +28,7 @@
             <!-- Search form and results -->
             <form id="search-form" action="{{ url_for('search_fn', labels_set=request.view_args['labels_set']) }}" method="get">
                 <input type="text" id="search-input" name="q" placeholder="Enter book subject(s)" size="70">
+                <input type="hidden" id="initial-input-timestamp" name="initial_input_timestamp" value="">
                 <button type="submit">Search</button>
             </form>
             <!-- Button to give up searching the book -->
@@ -106,11 +107,23 @@
 
             // Attach event listeners to the "Select" buttons
             $('.select-btn').on('click', async function () {
-                const selectedTitle = $(this).data('title');
-                const selectedAuthors = $(this).data('authors');
-                const selectedYear = $(this).data('year');
-                const selectedISBN = $(this).data('isbn');
-                await submitSelectedResult(selectedTitle, selectedAuthors, selectedYear, selectedISBN, query);
+                const title = $(this).data('title');
+                const authors = $(this).data('authors');
+                const year = $(this).data('year');
+                const isbn = $(this).data('isbn');
+                const searchTerms = query
+                const searchBeginTime = $('#initial-input-timestamp').val();
+                const searchEndTime = new Date().toISOString();
+
+                await submitSelectedResult(
+                    title,
+                    authors,
+                    year,
+                    isbn,
+                    searchTerms,
+                    searchBeginTime,
+                    searchEndTime,
+                );
                 // Clear search results
                 $('#results').empty();
                 // Clear the search input field
@@ -119,13 +132,15 @@
             });
         });
 
-        async function submitSelectedResult(title, authors, year, isbn, searchTerms) {
+        async function submitSelectedResult(title, authors, year, isbn, searchTerms, searchBeginTime, searchEndTime) {
             const formData = new FormData();
             formData.append('title', title);
             formData.append('authors', authors);
             formData.append('year', year);
             formData.append('isbn', isbn);
-            formData.append('searchTerms', searchTerms);
+            formData.append('search_terms', searchTerms);
+            formData.append('search_begin_time_utc', searchBeginTime);
+            formData.append('search_end_time_utc', searchEndTime);
 
             await fetch("{{ url_for('select_fn', labels_set=request.view_args['labels_set']) }}", {
                 method: 'POST',
@@ -151,7 +166,16 @@
             // Fetch and display selected books when the page loads
             populateSelectedBooksTable("{{ request.view_args['labels_set'] }}");
 
-            $("#search-input")
+            let initialInputTimestamp;
+
+            $('#search-input')
+            .on('input', function () {
+                    // Capture the initial input timestamp when the user starts typing
+                    if (!initialInputTimestamp) {
+                        initialInputTimestamp = new Date().toISOString();
+                        $('#initial-input-timestamp').val(initialInputTimestamp);
+                    }
+                })
                 .autocomplete({
                     minLength: 3,  // Set the minimum length required to trigger autocomplete
                     source: function (request, response) {
