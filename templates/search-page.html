@@ -32,14 +32,16 @@
                 <button type="submit">Search</button>
             </form>
             <!-- Button to give up searching the book -->
-            <button type="button" id="abandon-btn" data-toggle="modal" data-target="#abandonModal">
+            <button type="button" id="abandon-btn" data-toggle="modal" data-target="#abandon-modal">
                 Book cannot be found, proceed to next book!
             </button>
             <!-- Book abandoning Modal -->
-            <div class="modal fade" id="abandonModal">
+            <div class="modal fade" id="abandon-modal">
                 <div class="modal-dialog">
                     <div class="modal-content">
-                        <form id="abandon-form" action="{{ url_for('abandon_fn', labels_set=request.view_args['labels_set']) }}" method="post" autocomplete="off">
+                        <form id="abandon-form"
+                            action="{{ url_for('abandon_fn', labels_set=request.view_args['labels_set']) }}"
+                            method="post" autocomplete="off">
                             <div class="modal-header">
                                 <h4 class="modal-title">What book was not found?</h4>
                                 <button type="button" class="close" data-dismiss="modal">&times;</button>
@@ -131,6 +133,10 @@
             });
         });
 
+        $('#abandon-modal').on('shown.bs.modal', function () {
+            $('#title').focus();
+        })
+
         $('#abandon-form').on('submit', async function (event) {
             event.preventDefault();
             const formData = new FormData();
@@ -152,7 +158,7 @@
             }).catch(error => {
                 console.error('Error abandoning result:', error);
             });
-            $('#abandonModal').modal('hide');
+            $('#abandon-modal').modal('hide');
             await populateSelectedBooksTable("{{ request.view_args['labels_set'] }}");
         });
 
