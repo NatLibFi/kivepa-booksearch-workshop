@@ -153,6 +153,7 @@
                 console.error('Error abandoning result:', error);
             });
             $('#abandonModal').modal('hide');
+            await populateSelectedBooksTable("{{ request.view_args['labels_set'] }}");
         });
 
         async function submitSelectedResult(title, authors, year, isbn, searchTerms, searchBeginTime, searchEndTime) {
