@@ -28,6 +28,7 @@ def create_table(cursor):
             authors TEXT,
             year INTEGER,
             isbn INTEGER,
+            is_found INTEGER,
             labels_set TEXT,
             search_count INT,
             search_terms TEXT,
@@ -77,16 +78,18 @@ def abandon_fn(labels_set):
             INSERT INTO selected_books (
                 title,
                 authors,
+                is_found,
                 labels_set,
                 search_count,
                 search_begin_time_utc,
                 abandon_time_utc,
                 uid)
-            VALUES (?, ?, ?, ?, ?, ?, ?)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
         """,
             (
                 title,
                 authors,
+                0,  # Not found
                 labels_set,
                 search_count,
                 search_begin_time_utc,
@@ -197,19 +200,21 @@ def select_fn(labels_set):
                 authors,
                 year,
                 isbn,
+                is_found,
                 labels_set,
                 search_terms,
                 search_count,
                 search_begin_time_utc,
                 search_end_time_utc,
                 uid)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """,
             (
                 title,
                 authors,
                 year,
                 isbn,
+                1,  # is found
                 labels_set,
                 search_terms,
                 search_count,
@@ -234,20 +239,19 @@ def get_selected_books_fn(labels_set):
         create_table(cursor)
         cursor.execute(
             """
-            SELECT title, authors, labels_set, search_count FROM selected_books
+            SELECT title, authors, is_found FROM selected_books
             WHERE uid = ? AND labels_set = ? ORDER BY search_end_time_utc ASC
         """,
             (str(session["uid"]), labels_set),
         )
 
         rows = cursor.fetchall()
-        for title, authors, labels_set, search_count in rows:
+        for title, authors, is_found in rows:
             user_selected_books.append(
                 {
                     "title": title,
                     "authors": authors,
-                    "labels_set": labels_set.upper(),
-                    "search_count": search_count,
+                    "is_found": is_found,
                 }
             )
 

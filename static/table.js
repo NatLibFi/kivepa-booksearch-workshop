@@ -14,8 +14,7 @@ async function populateSelectedBooksTable(labels_set) {
                 <td>${rowNumber}</td>
                 <td>${book.title}</td>
                 <td>${book.authors}</td>
-                <td>${book.labels_set}</td>
-                <td>${book.search_count}</td>
+                <td>${book.is_found}</td>
             `);
             tableBody.append(row);
 
