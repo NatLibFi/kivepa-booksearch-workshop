@@ -39,7 +39,7 @@
             <div class="modal fade" id="abandonModal">
                 <div class="modal-dialog">
                     <div class="modal-content">
-                        <form id="abandon-form" action="{{ url_for('abandon_fn', labels_set=request.view_args['labels_set']) }}" method="post">
+                        <form id="abandon-form" action="{{ url_for('abandon_fn', labels_set=request.view_args['labels_set']) }}" method="post" autocomplete="off">
                             <div class="modal-header">
                                 <h4 class="modal-title">What book was not found?</h4>
                                 <button type="button" class="close" data-dismiss="modal">&times;</button>
