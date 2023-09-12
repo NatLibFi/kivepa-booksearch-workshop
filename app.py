@@ -33,7 +33,7 @@ def create_table(cursor):
             search_terms TEXT,
             search_begin_time_utc TEXT,
             search_end_time_utc TEXT,
-            abandonment_time_utc TEXT,
+            abandon_time_utc TEXT,
             uid TEXT
         )
     """
@@ -57,8 +57,44 @@ def search_page_fn(labels_set):
 @app.route("/<labels_set>/abandon", methods=["POST"])
 def abandon_fn(labels_set):
     title = request.form.get("title")
-    author = request.form.get("author")
-    print(f"Book not found: {author} - {title}")
+    authors = request.form.get("authors")
+    labels_set = labels_set
+    search_count = session["search_count"]
+    search_begin_time_utc = request.form.get("search_begin_time_utc")
+    abandon_time_utc = request.form.get("abandonTime")
+    uid = str(session["uid"])
+    print(f"Book not found: {title} - {authors}")
+
+    # Connect to the SQLite database
+    with sqlite3.connect(sqlite3_db_path) as connection:
+        cursor = connection.cursor()
+        # Create the table if it doesn't exist
+        create_table(cursor)
+
+        # Insert the selected result into the database
+        cursor.execute(
+            """
+            INSERT INTO selected_books (
+                title,
+                authors,
+                labels_set,
+                search_count,
+                search_begin_time_utc,
+                abandon_time_utc,
+                uid)
+            VALUES (?, ?, ?, ?, ?, ?, ?)
+        """,
+            (
+                title,
+                authors,
+                labels_set,
+                search_count,
+                search_begin_time_utc,
+                abandon_time_utc,
+                uid,
+            ),
+        )
+
     # The used labels set needs to be retained
     return redirect(f"/{labels_set}/search_page")
 
@@ -94,7 +130,6 @@ def autocomplete():
 
 @app.route("/<labels_set>/search", methods=["GET"])
 def search_fn(labels_set):
-    print(labels_set)
     query = request.args.get("q", "")
     if not query:
         return jsonify({"error": "Missing 'q' parameter"}), 400
@@ -141,7 +176,7 @@ def select_fn(labels_set):
     authors = request.form.get("authors")
     year = request.form.get("year")
     isbn = request.form.get("isbn")
-    used_labels_set = labels_set
+    labels_set = labels_set
     search_count = session["search_count"]
     search_terms = request.form.get("search_terms")
     search_begin_time_utc = request.form.get("search_begin_time_utc")
@@ -175,7 +210,7 @@ def select_fn(labels_set):
                 authors,
                 year,
                 isbn,
-                used_labels_set,
+                labels_set,
                 search_terms,
                 search_count,
                 search_begin_time_utc,

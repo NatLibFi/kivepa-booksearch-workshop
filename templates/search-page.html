@@ -39,8 +39,7 @@
             <div class="modal fade" id="abandonModal">
                 <div class="modal-dialog">
                     <div class="modal-content">
-                        <form action="{{ url_for('abandon_fn', labels_set=request.view_args['labels_set']) }}"
-                            method="post">
+                        <form id="abandon-form" action="{{ url_for('abandon_fn', labels_set=request.view_args['labels_set']) }}" method="post">
                             <div class="modal-header">
                                 <h4 class="modal-title">What book was not found?</h4>
                                 <button type="button" class="close" data-dismiss="modal">&times;</button>
@@ -48,8 +47,8 @@
                             <div class="modal-body">
                                 <label for="title">Book Title:</label>
                                 <input type="text" id="title" name="title" class="form-control">
-                                <label for="author">Book Author:</label>
-                                <input type="text" id="author" name="author" class="form-control">
+                                <label for="authors">Book Author(s):</label>
+                                <input type="text" id="authors" name="authors" class="form-control">
                             </div>
                             <div class="modal-footer">
                                 <button type="submit">Confirm not-found</button>
@@ -132,6 +131,30 @@
             });
         });
 
+        $('#abandon-form').on('submit', async function (event) {
+            event.preventDefault();
+            const formData = new FormData();
+            const title = $('input[name="title"]').val();
+            const authors = $('input[name="authors"]').val();
+            const searchBeginTime = $('#initial-input-timestamp').val();
+            const abandonTime = new Date().toISOString();
+
+            formData.append('title', title);
+            formData.append('authors', authors);
+            formData.append('search_begin_time_utc', searchBeginTime)
+            formData.append('abandonTime', abandonTime);
+
+            await fetch("{{ url_for('abandon_fn', labels_set=request.view_args['labels_set']) }}", {
+                method: 'POST',
+                body: formData
+            }).then(response => {
+                // Handle response as needed
+            }).catch(error => {
+                console.error('Error abandoning result:', error);
+            });
+            $('#abandonModal').modal('hide');
+        });
+
         async function submitSelectedResult(title, authors, year, isbn, searchTerms, searchBeginTime, searchEndTime) {
             const formData = new FormData();
             formData.append('title', title);
@@ -169,7 +192,7 @@
             let initialInputTimestamp;
 
             $('#search-input')
-            .on('input', function () {
+                .on('input', function () {
                     // Capture the initial input timestamp when the user starts typing
                     if (!initialInputTimestamp) {
                         initialInputTimestamp = new Date().toISOString();
