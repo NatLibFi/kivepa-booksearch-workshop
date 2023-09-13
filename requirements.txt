@@ -2,3 +2,6 @@ annif-client
 flask
 elasticsearch
 requests
+jupyter
+pandas
+matplotlib
