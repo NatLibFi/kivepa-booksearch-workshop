@@ -17,8 +17,7 @@
     </div>
     <div class="container">
         <div class="left-column">
-            <h2>Selected Books</h2>
-            <!-- Selected books table -->
+            <h2>Searched Books</h2>
             <table id="selected-books-table-{{ request.view_args['labels_set'] }}" class="selected-books-table"></table>
         </div>
         <div class="right-column">
@@ -94,7 +93,7 @@
                         <img src="${coverImageUrl}${result.isbn}" alt="Cover Image" class="book-cover">
                         <div class="result-details">
                             <p><strong>Title:</strong> ${result.title}</p>
-                            <p><strong>Authors:</strong> ${result.authors}</p>
+                            <p><strong>Author(s):</strong> ${result.authors}</p>
                             <p><strong>Year:</strong> ${result.year}</p>
                             <p><strong>ISBN:</strong> ${result.isbn}</p>
                             <button class="select-btn" data-title="${result.title}" data-authors="${result.authors}" data-year="${result.year}" data-isbn="${result.isbn}">Select and new search</button>
