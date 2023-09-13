@@ -163,6 +163,9 @@
             $('#results').empty();
             // Clear the search input field
             $('#search-input').val('');
+            // Clear the modal input fields
+            $('#title').val('');
+            $('#authors').val('');
             await populateSelectedBooksTable("{{ request.view_args['labels_set'] }}");
         });
 
