@@ -94,7 +94,6 @@ button {
     cursor: pointer;
 }
 button:disabled {
-    background-color: gray;
     cursor: default;
 }
 
@@ -139,14 +138,4 @@ button:disabled {
 .result-details {
     flex: 1;
     margin-left: 20px;
-}
-
-.select-btn {
-    padding: 6px 12px;
-    font-size: 14px;
-    background-color: #28a745;
-    border: none;
-    color: white;
-    border-radius: 4px;
-    cursor: pointer;
 }

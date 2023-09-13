@@ -28,10 +28,10 @@
             <form id="search-form" action="{{ url_for('search_fn', labels_set=request.view_args['labels_set']) }}" method="get">
                 <input type="text" id="search-input" name="q" placeholder="Enter book subject(s)" size="70">
                 <input type="hidden" id="initial-input-timestamp" name="initial_input_timestamp" value="">
-                <button type="submit" id="search-btn" disabled="disabled">Search</button>
+                <button type="submit" id="search-btn" class="btn btn-primary" disabled>Search</button>
             </form>
             <!-- Button to give up searching the book -->
-            <button type="button" id="abandon-btn" data-toggle="modal" data-target="#abandon-modal">
+            <button type="button" id="abandon-btn" class="btn btn-danger" data-toggle="modal" data-target="#abandon-modal">
                 Book cannot be found, proceed to next book!
             </button>
             <!-- Book abandoning Modal -->
@@ -52,7 +52,7 @@
                                 <input type="text" id="authors" name="authors" class="form-control">
                             </div>
                             <div class="modal-footer">
-                                <button type="submit">Confirm not-found</button>
+                                <button type="submit" class="btn btn-primary">Confirm not-found</button>
                             </div>
                         </form>
                     </div>
@@ -96,7 +96,7 @@
                             <p><strong>Author(s):</strong> ${result.authors}</p>
                             <p><strong>Year:</strong> ${result.year}</p>
                             <p><strong>ISBN:</strong> ${result.isbn}</p>
-                            <button class="select-btn" data-title="${result.title}" data-authors="${result.authors}" data-year="${result.year}" data-isbn="${result.isbn}">Select and new search</button>
+                            <button class="btn btn-success" data-title="${result.title}" data-authors="${result.authors}" data-year="${result.year}" data-isbn="${result.isbn}">Select and new search</button>
                         </div>
                     `);
                     resultsDiv.append(resultDiv);
