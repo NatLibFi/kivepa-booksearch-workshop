@@ -28,7 +28,7 @@
             <form id="search-form" action="{{ url_for('search_fn', labels_set=request.view_args['labels_set']) }}" method="get">
                 <input type="text" id="search-input" name="q" placeholder="Enter book subject(s)" size="70">
                 <input type="hidden" id="initial-input-timestamp" name="initial_input_timestamp" value="">
-                <button type="submit">Search</button>
+                <button type="submit" id="search-btn" disabled="disabled">Search</button>
             </form>
             <!-- Button to give up searching the book -->
             <button type="button" id="abandon-btn" data-toggle="modal" data-target="#abandon-modal">
@@ -128,6 +128,8 @@
                 $('#results').empty();
                 // Clear the search input field
                 $('#search-input').val('');
+                // Disable search button
+                $("#search-btn").prop('disabled', true);
                 await populateSelectedBooksTable("{{ request.view_args['labels_set'] }}");
             });
         });
@@ -165,6 +167,8 @@
             // Clear the modal input fields
             $('#title').val('');
             $('#authors').val('');
+            // Disable search button
+            $("#search-btn").prop('disabled', true);
             await populateSelectedBooksTable("{{ request.view_args['labels_set'] }}");
         });
 
@@ -235,6 +239,11 @@
                         // prevent value inserted on focus
                         return false;
                     },
+                    change: function(event, ui) {
+                        if (ui.item == null) {
+                            $("#search-btn").prop('disabled', true);
+                        }
+                    },
                     select: function (event, ui) {
                         var terms = split(this.value);
                         // remove the current input
@@ -244,6 +253,7 @@
                         // add placeholder to get the comma-and-space at the end
                         terms.push("");
                         this.value = terms.join(", ");
+                        $("#search-btn").prop('disabled', false);
                         return false;
                     },
                 });

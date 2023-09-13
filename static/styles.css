@@ -93,6 +93,10 @@ button {
     border-radius: 4px;
     cursor: pointer;
 }
+button:disabled {
+    background-color: gray;
+    cursor: default;
+}
 
 #search-btn {
     margin-left: 0;
