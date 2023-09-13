@@ -159,6 +159,10 @@
                 console.error('Error abandoning result:', error);
             });
             $('#abandon-modal').modal('hide');
+            // Clear search results
+            $('#results').empty();
+            // Clear the search input field
+            $('#search-input').val('');
             await populateSelectedBooksTable("{{ request.view_args['labels_set'] }}");
         });
 
