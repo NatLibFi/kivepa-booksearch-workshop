@@ -60,7 +60,7 @@ print(f"Read annif subjects for {len(books_annif_subjects)} books")
 index_mapping = {
     "mappings": {
         "properties": {
-            "work-uri": {"work-uri": "text"},
+            "work-uri": {"type": "text"},
             "authors": {"type": "text"},
             "title": {"type": "text"},
             "isbn": {"type": "text"},
