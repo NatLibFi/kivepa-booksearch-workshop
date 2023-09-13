@@ -82,13 +82,15 @@ loaded_books = set()
 errored = 0
 skipped = 0
 for book_json in books:
-    if len(loaded_books) >= 8000:  # TMP, for getting small dev set
-        break
+    # if len(loaded_books) >= 8000:  # TMP, for getting small dev set
+    #     break
 
     try:
         book = parse_book_json(book_json)  # to be imported to Elasticsearch
     except KeyError as err:
-        print(f"Key not found: {err}")
+        print(f"Failed parsing book - Key not found: {err}")
+        print(book_json)
+        print()
         errored += 1
         continue
 
@@ -101,7 +103,10 @@ for book_json in books:
     try:
         book["subjects-b-uris"] = books_annif_subjects[book["work-uri"]]
     except KeyError as err:
-        print(f"Key not found: {err}")
+        print(f"Failed getting Annif subjects - Key not found: {err}")
+        print(f'Book title: {book["title"]}')
+        print()
+        errored += 1
         continue
     book["subjects-b-labels"] = resolve_uris_to_labels(book["subjects-b-uris"])
 
