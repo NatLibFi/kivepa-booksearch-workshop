@@ -34,7 +34,7 @@ def create_table(cursor):
             search_terms TEXT,
             search_begin_time_utc TEXT,
             search_end_time_utc TEXT,
-            abandon_time_utc TEXT,
+            search_abandon_time_utc TEXT,
             uid TEXT
         )
     """
@@ -62,7 +62,7 @@ def abandon_fn(labels_set):
     labels_set = labels_set
     search_count = session["search_count"]
     search_begin_time_utc = request.form.get("search_begin_time_utc")
-    abandon_time_utc = request.form.get("abandonTime")
+    search_abandon_time_utc = request.form.get("abandonTime")
     uid = str(session["uid"])
     print(f"Book not found: {title} - {authors}")
 
@@ -82,7 +82,7 @@ def abandon_fn(labels_set):
                 labels_set,
                 search_count,
                 search_begin_time_utc,
-                abandon_time_utc,
+                search_abandon_time_utc,
                 uid)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?)
         """,
@@ -93,7 +93,7 @@ def abandon_fn(labels_set):
                 labels_set,
                 search_count,
                 search_begin_time_utc,
-                abandon_time_utc,
+                search_abandon_time_utc,
                 uid,
             ),
         )
