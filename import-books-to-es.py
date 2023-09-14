@@ -99,7 +99,6 @@ for book_json in books:
         skipped += 1
         continue
 
-    book["subjects-a-labels"] = resolve_uris_to_labels(book["subjects-a-uris"])
     try:
         book["subjects-b-uris"] = books_annif_subjects[book["work-uri"]]
     except KeyError as err:
@@ -108,7 +107,20 @@ for book_json in books:
         print()
         errored += 1
         continue
-    book["subjects-b-labels"] = resolve_uris_to_labels(book["subjects-b-uris"])
+    try:
+        book["subjects-a-labels"] = resolve_uris_to_labels(book["subjects-a-uris"])
+    except Exception as err:
+        print("URI resolving failed for set A")
+        print(f'Book title: {book["title"]}')
+        print(err)
+        continue
+    try:
+        book["subjects-b-labels"] = resolve_uris_to_labels(book["subjects-b-uris"])
+    except Exception as err:
+        print("URI resolving failed for set B")
+        print(f'Book title: {book["title"]}')
+        print(err)
+        continue
 
     action = {"_index": index_name, "_source": book}
     actions.append(action)
