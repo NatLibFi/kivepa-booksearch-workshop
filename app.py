@@ -246,6 +246,7 @@ def get_selected_books_fn(labels_set):
         )
 
         rows = cursor.fetchall()
+        print(f"Labels-set: {labels_set} - rows: {len(rows)}")
         for title, authors, is_found in rows:
             user_selected_books.append(
                 {
