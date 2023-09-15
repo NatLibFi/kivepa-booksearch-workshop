@@ -9,11 +9,11 @@ async function generateBooksTable(labels_set) {
         // Generate and insert the table head
         const tableHead = $('<thead>').html(`
             <tr>
-            <th>#</th>
-            <th>Title</th>
-            <th>Author(s)</th>
+                <th>#</th>
+                <th>Title</th>
+                <th>Author(s)</th>
                 <th>Is found</th>
-                </tr>
+            </tr>
         `);
         table.append(tableHead);
 
