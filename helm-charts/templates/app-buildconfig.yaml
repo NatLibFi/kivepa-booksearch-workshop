@@ -19,7 +19,7 @@ spec:
     type: Git
     git:
       uri: 'git@github.com:juhoinkinen/kvp-2023'
-      ref: 'main'
+      ref: 'debug-table'
     sourceSecret:
       name: kvp-2023-annif-workshop-github-repo
   triggers:
