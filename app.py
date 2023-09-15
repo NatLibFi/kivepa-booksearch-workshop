@@ -240,7 +240,7 @@ def get_selected_books_fn(labels_set):
         cursor.execute(
             """
             SELECT title, authors, is_found FROM selected_books
-            WHERE uid = ? AND labels_set = ? ORDER BY search_begin_time_utc ASC
+            WHERE uid = ? AND labels_set = ? ORDER BY id ASC
         """,
             (str(session["uid"]), labels_set),
         )
