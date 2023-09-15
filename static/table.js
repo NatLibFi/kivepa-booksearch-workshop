@@ -6,7 +6,6 @@ async function populateSelectedBooksTable(labels_set) {
         const data = await response.json();
 
         const tableBody = $('#selected-books-table-' + labels_set + ' tbody');
-        tableBody.empty(); // Clear existing rows
 
         let rowNumber = 1; // Initialize the row number
 
