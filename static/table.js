@@ -3,8 +3,11 @@ async function populateSelectedBooksTable(labels_set) {
 
     try {
         const response = await fetch('/' + labels_set + '/get_selected_books');
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
         const data = await response.json();
-
+        
         const tableBody = $('#selected-books-table-' + labels_set + ' tbody');
 
         let rowNumber = 1; // Initialize the row number
