@@ -211,6 +211,7 @@
 
             $('#search-input')
                 .on('input', function () {
+                    $("#search-btn").prop('disabled', true);
                     // Capture the initial input timestamp when the user starts typing
                     if (!initialInputTimestamp) {
                         initialInputTimestamp = new Date().toISOString();
@@ -239,11 +240,6 @@
                     focus: function () {
                         // prevent value inserted on focus
                         return false;
-                    },
-                    change: function (event, ui) {
-                        if (ui.item == null) {
-                            $("#search-btn").prop('disabled', true);
-                        }
                     },
                     select: function (event, ui) {
                         var terms = split(this.value);
