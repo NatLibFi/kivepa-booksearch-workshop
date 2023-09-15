@@ -35,7 +35,21 @@
                 <h2>Labels B</h2>
                 <a href="{{ url_for('search_page_fn', labels_set='b') }}">Search with labels B</a>
                 <h3>Searched Books</h3>
-                <table id="selected-books-table-b" class="selected-books-table"></table>
+                <table id="selected-books-table-b" class="selected-books-table">
+                    <table id="selected-books-table-a" class="selected-books-table">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Title</th>
+                                <th>Author(s)</th>
+                                <th>Is found</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Selected books will be displayed here -->
+                        </tbody>
+                    </table>
+                </table>
             </div>
         </div>
     </div>
@@ -46,11 +60,10 @@
     <script src="/static/table.js"></script>
 
     <script>
-        $(document).ready(async function () {
-            await $(".selected-books-table").load('/static/table.html');
+        $(document).ready(function () {
             // Fetch and display selected books when the page loads
-            await populateSelectedBooksTable('a');
-            await populateSelectedBooksTable('b');
+            populateSelectedBooksTable('a');
+            populateSelectedBooksTable('b');
         });
     </script>
 </body>
