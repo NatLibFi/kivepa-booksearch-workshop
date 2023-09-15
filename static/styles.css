@@ -15,6 +15,7 @@ h2 {
     text-align: center;
     margin: 20px 0;
 }
+
 h3 {
     text-align: center;
     margin: 20px 0;
@@ -22,12 +23,14 @@ h3 {
 
 /* For index page */
 .centering-col {
-padding: 0 20px; /* Add some padding for spacing */
-display: flex;
-flex-direction: column;
-align-items: center;
-justify-content: center;
-height: 100%; /* Ensure the column takes up the full height */
+    padding: 0 20px;
+    /* Add some padding for spacing */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    /* Ensure the column takes up the full height */
 }
 
 /* Style for the container holding the two columns */
@@ -51,23 +54,23 @@ height: 100%; /* Ensure the column takes up the full height */
     flex: 2;
 }
 
-.selected-books-table {
+.books-table {
     width: 100%;
     border-collapse: collapse;
 }
 
-.selected-books-table th,
-.selected-books-table td {
+.books-table th,
+.books-table td {
     border: 1px solid #ddd;
     padding: 8px;
     text-align: left;
 }
 
-.selected-books-table th {
+.books-table th {
     background-color: #f5f5f5;
 }
 
-.selected-books-table tbody tr:nth-child(even) {
+.books-table tbody tr:nth-child(even) {
     background-color: #f2f2f2;
 }
 
@@ -93,6 +96,7 @@ button {
     border-radius: 4px;
     cursor: pointer;
 }
+
 button:disabled {
     cursor: default;
 }

@@ -1,10 +1,21 @@
-async function populateSelectedBooksTable(labels_set) {
+async function generateBooksTable(labels_set) {
     try {
         const response = await fetch('/' + labels_set + '/get_selected_books');
         const data = await response.json();
 
-        const tableBody = $('#selected-books-table-' + labels_set + ' tbody');
-        tableBody.empty(); // Clear existing rows
+        const table = $('#books-table-' + labels_set);
+        table.empty(); // Clear existing rows
+
+        // Generate and insert the table head
+        const tableHead = $('<thead>').html(`
+            <tr>
+            <th>#</th>
+            <th>Title</th>
+            <th>Author(s)</th>
+                <th>Is found</th>
+                </tr>
+        `);
+        table.append(tableHead);
 
         let rowNumber = 1; // Initialize the row number
 
@@ -16,7 +27,7 @@ async function populateSelectedBooksTable(labels_set) {
                 <td>${book.authors}</td>
                 <td>${book.is_found}</td>
             `);
-            tableBody.append(row);
+            table.append(row);
 
             rowNumber++; // Increment the row number for the next row
         });
