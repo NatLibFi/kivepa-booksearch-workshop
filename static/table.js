@@ -1,4 +1,6 @@
 async function populateSelectedBooksTable(labels_set) {
+    await $(".selected-books-table").load('/static/table.html');
+
     try {
         const response = await fetch('/' + labels_set + '/get_selected_books');
         const data = await response.json();

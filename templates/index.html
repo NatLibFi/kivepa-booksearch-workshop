@@ -33,8 +33,7 @@
     <script src="/static/table.js"></script>
 
     <script>
-        $(document).ready(async function () {
-            await $(".selected-books-table").load('/static/table.html');
+        $(document).ready(function () {
             // Fetch and display selected books when the page loads
             populateSelectedBooksTable('a');
             populateSelectedBooksTable('b');
