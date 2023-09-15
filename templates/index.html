@@ -17,7 +17,19 @@
                 <h2>Labels A</h2>
                 <a href="{{ url_for('search_page_fn', labels_set='a') }}">Search with labels A</a>
                 <h3>Searched Books</h3>
-                <table id="selected-books-table-a" class="selected-books-table"></table>
+                <table id="selected-books-table-a" class="selected-books-table">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Title</th>
+                            <th>Author(s)</th>
+                            <th>Is found</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Selected books will be displayed here -->
+                    </tbody>
+                </table>
             </div>
             <div class="col centering-col">
                 <h2>Labels B</h2>
