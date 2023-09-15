@@ -201,8 +201,8 @@
             return split(term).pop();
         }
 
-        $(document).ready(function () {
-            $(".selected-books-table").load('/static/table.html');
+        $(document).ready(async function () {
+            await $(".selected-books-table").load('/static/table.html');
             // Fetch and display selected books when the page loads
             populateSelectedBooksTable("{{ request.view_args['labels_set'] }}");
 
