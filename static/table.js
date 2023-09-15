@@ -10,6 +10,7 @@ async function populateSelectedBooksTable(labels_set) {
 
         let rowNumber = 1; // Initialize the row number
 
+        console.log(data.selectedBooks.length);
         data.selectedBooks.forEach(book => {
             const row = $('<tr>');
             row.html(`
