@@ -1,6 +1,6 @@
 import sys
-from elasticsearch import Elasticsearch
 
+from elasticsearch import Elasticsearch
 
 # Connect to Elasticsearch
 if len(sys.argv) > 1:

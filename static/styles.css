@@ -21,20 +21,8 @@ h3 {
     margin: 20px 0;
 }
 
-/* For index page */
-.centering-col {
-    padding: 0 20px;
-    /* Add some padding for spacing */
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    height: 100%;
-    /* Ensure the column takes up the full height */
-}
-
 /* Style for the container holding the two columns */
-.container {
+#main {
     display: flex;
     justify-content: space-between;
     max-width: 1200px;

@@ -3,7 +3,6 @@ import warnings
 
 from elasticsearch import Elasticsearch
 
-
 if len(sys.argv) > 1:
     bt = sys.argv[1]
 else:
@@ -33,4 +32,4 @@ for hit in resp["hits"]["hits"]:
     print(f'ISBN: {book["isbn"]}')
     print(f'Labels A: {book["subjects-a-labels"]}')
     print(f'Labels B: {book["subjects-b-labels"]}')
-    print('---')
+    print("---")

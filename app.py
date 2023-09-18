@@ -22,7 +22,7 @@ def create_table(cursor):
     # Create a table if it doesn't exist
     cursor.execute(
         """
-        CREATE TABLE IF NOT EXISTS selected_books (
+        CREATE TABLE IF NOT EXISTS searched_books (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             title TEXT,
             authors TEXT,
@@ -45,21 +45,16 @@ def create_table(cursor):
 def index():
     if "uid" not in session:
         session["uid"] = uuid.uuid4()
+    session["search_count"] = 0
     print(f"User {session['uid']}")
     return render_template("index.html")
 
 
-@app.route("/<labels_set>/search_page")
-def search_page_fn(labels_set):
-    session["search_count"] = 0
-    return render_template("search-page.html")
-
-
-@app.route("/<labels_set>/abandon", methods=["POST"])
-def abandon_fn(labels_set):
+@app.route("/abandon", methods=["POST"])
+def abandon_fn():
     title = request.form.get("title")
     authors = request.form.get("authors")
-    labels_set = labels_set
+    labels_set = "A/B"  # TODO, remove?
     search_count = session["search_count"]
     search_begin_time_utc = request.form.get("search_begin_time_utc")
     search_abandon_time_utc = request.form.get("abandonTime")
@@ -75,7 +70,7 @@ def abandon_fn(labels_set):
         # Insert the selected result into the database
         cursor.execute(
             """
-            INSERT INTO selected_books (
+            INSERT INTO searched_books (
                 title,
                 authors,
                 is_found,
@@ -99,7 +94,7 @@ def abandon_fn(labels_set):
         )
 
     # The used labels set needs to be retained
-    return redirect(f"/{labels_set}/search_page")
+    return redirect("/")
 
 
 @app.route("/autocomplete", methods=["GET"])
@@ -131,7 +126,7 @@ def autocomplete():
     return jsonify(suggestion_values)
 
 
-@app.route("/<labels_set>/search", methods=["GET"])
+@app.route("/search/<labels_set>", methods=["GET"])
 def search_fn(labels_set):
     query = request.args.get("q", "")
     if not query:
@@ -173,13 +168,13 @@ def search_fn(labels_set):
         return jsonify({"error": str(e)}), 500
 
 
-@app.route("/<labels_set>/select", methods=["POST"])
-def select_fn(labels_set):
+@app.route("/select", methods=["POST"])
+def select_fn():
     title = request.form.get("title")
     authors = request.form.get("authors")
     year = request.form.get("year")
     isbn = request.form.get("isbn")
-    labels_set = labels_set
+    labels_set = request.form.get("labels_set")
     search_count = session["search_count"]
     search_terms = request.form.get("search_terms")
     search_begin_time_utc = request.form.get("search_begin_time_utc")
@@ -195,7 +190,7 @@ def select_fn(labels_set):
         # Insert the selected result into the database
         cursor.execute(
             """
-            INSERT INTO selected_books (
+            INSERT INTO searched_books (
                 title,
                 authors,
                 year,
@@ -224,14 +219,13 @@ def select_fn(labels_set):
             ),
         )
 
-    session["search_count"] = 0
     return jsonify({"message": "Result selected and saved successfully"})
 
 
-@app.route("/<labels_set>/get_selected_books", methods=["GET"])
-def get_selected_books_fn(labels_set):
+@app.route("/searched_books", methods=["GET"])
+def get_searched_books_fn():
     # Retrieve selected books for the current user and labels set
-    user_selected_books = []
+    user_searched_books = []
 
     with sqlite3.connect(sqlite3_db_path) as connection:
         cursor = connection.cursor()
@@ -239,15 +233,15 @@ def get_selected_books_fn(labels_set):
         create_table(cursor)
         cursor.execute(
             """
-            SELECT title, authors, is_found FROM selected_books
-            WHERE uid = ? AND labels_set = ? ORDER BY id ASC
+            SELECT title, authors, is_found FROM searched_books
+            WHERE uid = ? ORDER BY id ASC
         """,
-            (str(session["uid"]), labels_set),
+            (str(session["uid"]),),
         )
 
         rows = cursor.fetchall()
         for title, authors, is_found in rows:
-            user_selected_books.append(
+            user_searched_books.append(
                 {
                     "title": title,
                     "authors": authors,
@@ -255,7 +249,7 @@ def get_selected_books_fn(labels_set):
                 }
             )
 
-    return jsonify({"selectedBooks": user_selected_books})
+    return jsonify({"searchedBooks": user_searched_books})
 
 
 if __name__ == "__main__":

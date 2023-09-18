@@ -5,24 +5,70 @@
     <title>Books Search</title>
     <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <link rel="stylesheet" href="static/styles.css">
+    <link rel="stylesheet" href="/static/styles.css">
 </head>
 
 <body>
     <h1>Book Search</h1>
-    <div class="container-fluid">
-        <div class="row">
-            <div class="col centering-col">
-                <h2>Labels A</h2>
-                <a href="{{ url_for('search_page_fn', labels_set='a') }}">Search with labels A</a>
-                <h3>Searched Books</h3>
-                <table id="books-table-a" class="books-table"></table>
+    <div class="container" id="main">
+        <div class="left-column">
+            <h2>Searched Books</h2>
+            <table id="books-table" class="books-table"></table>
+        </div>
+        <div class="right-column">
+            <h2 id="labels-heading">Search</h2>
+
+            <!-- Search form -->
+            <form id="search-form" method="get">
+                <input type="text" id="search-input" name="q" placeholder="Enter book subject(s)" size="70">
+                <input type="hidden" id="initial-input-timestamp" name="initial_input_timestamp" value="">
+                <button type="submit" id="search-btn" class="btn btn-primary" disabled>Search</button>
+            </form>
+            <!-- Button to give up searching the book -->
+            <button type="button" id="abandon-btn" class="btn btn-danger" data-toggle="modal"
+                data-target="#abandon-modal">
+                Book cannot be found, proceed to next book!
+            </button>
+
+            <!-- Book abandoning Modal -->
+            <div class="modal fade" id="abandon-modal">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <form id="abandon-form"
+                            action="{{ url_for('abandon_fn', labels_set=request.view_args['labels_set']) }}"
+                            method="post" autocomplete="off">
+                            <div class="modal-header">
+                                <h4 class="modal-title">What book was not found?</h4>
+                                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                            </div>
+                            <div class="modal-body">
+                                <label for="title">Book Title:</label>
+                                <input type="text" id="title" name="title" class="form-control">
+                                <label for="authors">Book Author(s):</label>
+                                <input type="text" id="authors" name="authors" class="form-control">
+                            </div>
+                            <div class="modal-footer">
+                                <button type="submit" class="btn btn-primary">Confirm not-found</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
             </div>
-            <div class="col centering-col">
-                <h2>Labels B</h2>
-                <a href="{{ url_for('search_page_fn', labels_set='b') }}">Search with labels B</a>
-                <h3>Searched Books</h3>
-                <table id="books-table-b" class="books-table"></table>
+            <div class="container">
+                <div class="row">
+                    <div class="col-6">
+                        <h3>Labels A</h2>
+                        <div class="results" id="results-a">
+                            <!-- Search results will be displayed here -->
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <h3>Labels B</h2>
+                        <div class="results" id="results-b">
+                            <!-- Search results will be displayed here -->
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -33,11 +79,199 @@
     <script src="/static/table.js"></script>
 
     <script>
+        $('#search-form').on('submit', async function (event) {
+            event.preventDefault();
+
+            const query = $('input[name="q"]').val();
+
+            await searchLabels(query, 'a');
+            await searchLabels(query, 'b');
+
+            // Attach event listeners to the "Select" buttons
+            await $('.select-btn').on('click', async function () {
+                const labels_set= $(this).data('labels_set');
+                const title = $(this).data('title');
+                const authors = $(this).data('authors');
+                const year = $(this).data('year');
+                const isbn = $(this).data('isbn');
+                const searchTerms = query
+                const searchBeginTime = $('#initial-input-timestamp').val();
+                const searchEndTime = new Date().toISOString();
+
+                await submitSelectedResult(
+                    labels_set,
+                    title,
+                    authors,
+                    year,
+                    isbn,
+                    searchTerms,
+                    searchBeginTime,
+                    searchEndTime,
+                );
+                // Clear search results
+                // $('.results').empty();
+                // Clear the search input field
+                // $('#search-input').val('');
+                // Disable search button
+                // $("#search-btn").prop('disabled', true);
+                await generateBooksTable();
+            });
+        });
+
+        $('#abandon-modal').on('shown.bs.modal', function () {
+            $('#title').focus();
+        })
+
+        $('#abandon-form').on('submit', async function (event) {
+            event.preventDefault();
+            const formData = new FormData();
+            const title = $('input[name="title"]').val();
+            const authors = $('input[name="authors"]').val();
+            const searchBeginTime = $('#initial-input-timestamp').val();
+            const abandonTime = new Date().toISOString();
+
+            formData.append('title', title);
+            formData.append('authors', authors);
+            formData.append('search_begin_time_utc', searchBeginTime)
+            formData.append('abandonTime', abandonTime);
+
+            await fetch("{{ url_for('abandon_fn', labels_set=request.view_args['labels_set']) }}", {
+                method: 'POST',
+                body: formData
+            }).then(response => {
+                // Handle response as needed
+            }).catch(error => {
+                console.error('Error abandoning result:', error);
+            });
+            $('#abandon-modal').modal('hide');
+            // Clear search results
+            $('#results').empty();
+            // Clear the search input field
+            $('#search-input').val('');
+            // Clear the modal input fields
+            $('#title').val('');
+            $('#authors').val('');
+            // Disable search button
+            $("#search-btn").prop('disabled', true);
+            await generateBooksTable();
+        });
+
+        async function searchLabels(query, labels_set) {
+            const response = await fetch(`/search/${labels_set}?q=${query}`);
+            const data = await response.json();
+            const resultsDiv = $('#results-' + labels_set);
+            const totalCount = data.results_count;
+            resultsDiv.empty();
+
+            // Display the total number of results
+            const coverImageUrlBase = "https://www.finna.fi/Cover/Show?source=Solr&invisbn=";
+            const totalCountDiv = $('<h4>').addClass('total-count').text(`Number of Results: ${totalCount}`);
+            resultsDiv.append(totalCountDiv);
+
+            if (data.results) {
+                data.results.forEach(result => {
+                    const resultDiv = $('<div>').addClass('result');
+                    resultDiv.html(`
+                        <img src="${coverImageUrlBase}${result.isbn}" alt="Cover Image" class="book-cover">
+                        <div class="result-details">
+                            <p><strong>Title:</strong> ${result.title}</p>
+                            <p><strong>Author(s):</strong> ${result.authors}</p>
+                            <p><strong>Year:</strong> ${result.year}</p>
+                            <p><strong>ISBN:</strong> ${result.isbn}</p>
+                            <button class="select-btn btn btn-success" data-labels_set="${labels_set}" data-title="${result.title}" data-authors="${result.authors}" data-year="${result.year}" data-isbn="${result.isbn}">Select and new search</button>
+                        </div>
+                    `);
+                    resultsDiv.append(resultDiv);
+                });
+            } else {
+                resultsDiv.html('<p>No results found.</p>');
+            }
+        }
+
+        async function submitSelectedResult(labels_set, title, authors, year, isbn, searchTerms, searchBeginTime, searchEndTime) {
+            const formData = new FormData();
+            formData.append('labels_set', labels_set);
+            formData.append('title', title);
+            formData.append('authors', authors);
+            formData.append('year', year);
+            formData.append('isbn', isbn);
+            formData.append('search_terms', searchTerms);
+            formData.append('search_begin_time_utc', searchBeginTime);
+            formData.append('search_end_time_utc', searchEndTime);
+
+            await fetch("/select", {
+                method: 'POST',
+                body: formData
+            }).then(response => {
+                // Handle response as needed
+            }).catch(error => {
+                console.error('Error selecting result:', error);
+            });
+        }
+
+        function split(val) {
+            return val.split(/,\s*/);
+        }
+
+        // Function to extract the current term being typed
+        function extractLast(term) {
+            return split(term).pop();
+        }
+
         $(document).ready(function () {
             // Fetch and display selected books when the page loads
-            generateBooksTable('a');
-            generateBooksTable('b');
+            generateBooksTable()
+
+            let initialInputTimestamp;
+
+            $('#search-input')
+                .on('input', function () {
+                    $("#search-btn").prop('disabled', true);
+                    // Capture the initial input timestamp when the user starts typing
+                    if (!initialInputTimestamp) {
+                        initialInputTimestamp = new Date().toISOString();
+                        $('#initial-input-timestamp').val(initialInputTimestamp);
+                    }
+                })
+                .autocomplete({
+                    minLength: 3,  // Set the minimum length required to trigger autocomplete
+                    source: function (request, response) {
+                        const term = extractLast(request.term);
+
+                        if (request.term.length >= 3) {
+                            $.ajax({
+                                url: "/autocomplete",
+                                data: { q: term },
+                                dataType: "json",
+                                success: function (data) {
+                                    response(data);
+                                }
+                            });
+                        } else {
+                            // Clear autocomplete suggestions if input is less than 3 characters
+                            response([]);
+                        }
+                    },
+                    focus: function () {
+                        // prevent value inserted on focus
+                        return false;
+                    },
+                    select: function (event, ui) {
+                        var terms = split(this.value);
+                        // remove the current input
+                        terms.pop();
+                        // add the selected item
+                        terms.push(ui.item.value);
+                        // add placeholder to get the comma-and-space at the end
+                        terms.push("");
+                        this.value = terms.join(", ");
+                        $("#search-btn").prop('disabled', false);
+                        return false;
+                    },
+                });
+
         });
+
     </script>
 </body>
 

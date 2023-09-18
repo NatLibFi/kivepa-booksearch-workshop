@@ -1,9 +1,9 @@
-async function generateBooksTable(labels_set) {
+async function generateBooksTable() {
     try {
-        const response = await fetch('/' + labels_set + '/get_selected_books');
+        const response = await fetch('/searched_books');
         const data = await response.json();
 
-        const table = $('#books-table-' + labels_set);
+        const table = $('#books-table');
         table.empty(); // Clear existing rows
 
         // Generate and insert the table head
@@ -19,7 +19,7 @@ async function generateBooksTable(labels_set) {
 
         let rowNumber = 1; // Initialize the row number
 
-        data.selectedBooks.forEach(book => {
+        data.searchedBooks.forEach(book => {
             const row = $('<tr>');
             row.html(`
                 <td>${rowNumber}</td>
