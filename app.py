@@ -26,15 +26,16 @@ def create_table(cursor):
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             title TEXT,
             authors TEXT,
-            year INTEGER,
-            isbn INTEGER,
-            is_found INTEGER,
-            labels_set TEXT,
-            search_count INT,
-            search_terms TEXT,
+            is_found_a INTEGER,
+            is_found_b INTEGER,
+            search_count_a INT,
+            search_count_b INT,
+            search_terms_a TEXT,
+            search_terms_b TEXT,
             search_begin_time_utc TEXT,
+            found_a_time_utc TEXT,
+            found_b_time_utc TEXT,
             search_end_time_utc TEXT,
-            search_abandon_time_utc TEXT,
             uid TEXT
         )
     """
@@ -50,14 +51,20 @@ def index():
     return render_template("index.html")
 
 
-@app.route("/abandon", methods=["POST"])
-def abandon_fn():
+@app.route("/proceed", methods=["POST"])
+def proceed_fn():
     title = request.form.get("title")
     authors = request.form.get("authors")
-    labels_set = "A/B"  # TODO, remove?
-    search_count = session["search_count"]
+    is_found_a = request.form.get("isBookFoundA")
+    is_found_b = request.form.get("isBookFoundB")
+    search_count_a = 42  # TODO
+    search_count_b = 42  # TODO
+    search_terms_a = 'jotain'  # TODO
+    search_terms_b = 'jotain muuta'  # TODO
+    found_a_time_utc = '1234'
+    found_b_time_utc = '1234'
     search_begin_time_utc = request.form.get("search_begin_time_utc")
-    search_abandon_time_utc = request.form.get("abandonTime")
+    search_end_time_utc = request.form.get("search_end_time_utc")
     uid = str(session["uid"])
     print(f"Book not found: {title} - {authors}")
 
@@ -73,22 +80,33 @@ def abandon_fn():
             INSERT INTO searched_books (
                 title,
                 authors,
-                is_found,
-                labels_set,
-                search_count,
+                is_found_a,
+                is_found_b,
+                search_count_a,
+                search_count_b,
+                search_terms_a,
+                search_terms_b,
                 search_begin_time_utc,
-                search_abandon_time_utc,
-                uid)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                found_a_time_utc,
+                found_b_time_utc,
+                search_end_time_utc,
+                uid
+                )
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """,
             (
                 title,
                 authors,
-                0,  # Not found
-                labels_set,
-                search_count,
+                is_found_a,
+                is_found_b,
+                search_count_a,
+                search_count_b,
+                search_terms_a,
+                search_terms_b,
                 search_begin_time_utc,
-                search_abandon_time_utc,
+                found_a_time_utc,
+                found_b_time_utc,
+                search_end_time_utc,
                 uid,
             ),
         )
@@ -168,60 +186,6 @@ def search_fn(labels_set):
         return jsonify({"error": str(e)}), 500
 
 
-@app.route("/select", methods=["POST"])
-def select_fn():
-    title = request.form.get("title")
-    authors = request.form.get("authors")
-    year = request.form.get("year")
-    isbn = request.form.get("isbn")
-    labels_set = request.form.get("labels_set")
-    search_count = session["search_count"]
-    search_terms = request.form.get("search_terms")
-    search_begin_time_utc = request.form.get("search_begin_time_utc")
-    search_end_time_utc = request.form.get("search_end_time_utc")
-    uid = str(session["uid"])
-
-    # Connect to the SQLite database
-    with sqlite3.connect(sqlite3_db_path) as connection:
-        cursor = connection.cursor()
-        # Create the table if it doesn't exist
-        create_table(cursor)
-
-        # Insert the selected result into the database
-        cursor.execute(
-            """
-            INSERT INTO searched_books (
-                title,
-                authors,
-                year,
-                isbn,
-                is_found,
-                labels_set,
-                search_terms,
-                search_count,
-                search_begin_time_utc,
-                search_end_time_utc,
-                uid)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        """,
-            (
-                title,
-                authors,
-                year,
-                isbn,
-                1,  # is found
-                labels_set,
-                search_terms,
-                search_count,
-                search_begin_time_utc,
-                search_end_time_utc,
-                uid,
-            ),
-        )
-
-    return jsonify({"message": "Result selected and saved successfully"})
-
-
 @app.route("/searched_books", methods=["GET"])
 def get_searched_books_fn():
     # Retrieve selected books for the current user and labels set
@@ -233,19 +197,20 @@ def get_searched_books_fn():
         create_table(cursor)
         cursor.execute(
             """
-            SELECT title, authors, is_found FROM searched_books
+            SELECT title, authors, is_found_a, is_found_b FROM searched_books
             WHERE uid = ? ORDER BY id ASC
         """,
             (str(session["uid"]),),
         )
 
         rows = cursor.fetchall()
-        for title, authors, is_found in rows:
+        for title, authors, is_found_a, is_found_b in rows:
             user_searched_books.append(
                 {
                     "title": title,
                     "authors": authors,
-                    "is_found": is_found,
+                    "is_found_a": is_found_a,
+                    "is_found_b": is_found_b,
                 }
             )
 

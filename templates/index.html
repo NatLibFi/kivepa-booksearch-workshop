@@ -25,17 +25,16 @@
                 <button type="submit" id="search-btn" class="btn btn-primary" disabled>Search</button>
             </form>
             <!-- Button to proceed to next book -->
-            <button type="button" id="abandon-btn" class="btn btn-danger" data-toggle="modal"
-                data-target="#abandon-modal">
+            <button type="button" id="proceed-btn" class="btn btn-danger" data-target="#proceed-modal">
                 Proceed to next book!
             </button>
 
-            <!-- Book abandoning Modal -->
-            <div class="modal fade" id="abandon-modal">
+            <!-- Book proceeding Modal -->
+            <div class="modal fade" id="proceed-modal">
                 <div class="modal-dialog">
                     <div class="modal-content">
-                        <form id="abandon-form"
-                            action="{{ url_for('abandon_fn', labels_set=request.view_args['labels_set']) }}"
+                        <form id="proceed-form"
+                            action="{{ url_for('proceed_fn') }}"
                             method="post" autocomplete="off">
                             <div class="modal-header">
                                 <h4 class="modal-title">What book was not found?</h4>
@@ -58,21 +57,21 @@
                 <div class="row">
                     <div class="col-6">
                         <h3>Labels A</h2>
-                        <div class="results" id="results-a">
-                            <!-- Search results will be displayed here -->
-                        </div>
-                        <div class="results-book-found" id="results-book-found-a">
-                            Book found in here!
-                        </div>
+                            <div class="results" id="results-a">
+                                <!-- Search results will be displayed here -->
+                            </div>
+                            <div class="results-book-found" id="results-book-found-a">
+                                Book found in here!
+                            </div>
                     </div>
                     <div class="col-6">
                         <h3>Labels B</h2>
-                        <div class="results" id="results-b">
-                            <!-- Search results will be displayed here -->
-                        </div>
-                        <div class="results-book-found" id="results-book-found-b">
-                            Book found in here!
-                        </div>
+                            <div class="results" id="results-b">
+                                <!-- Search results will be displayed here -->
+                            </div>
+                            <div class="results-book-found" id="results-book-found-b">
+                                Book found in here!
+                            </div>
                     </div>
                 </div>
             </div>
@@ -85,6 +84,11 @@
     <script src="/static/table.js"></script>
 
     <script>
+        var isBookFoundA = false;
+        var isBookFoundB = false;
+        var selectedTitle;
+        var selectedAuthors;
+
         $('#search-form').on('submit', async function (event) {
             event.preventDefault();
 
@@ -95,58 +99,59 @@
 
             // Attach event listeners to the "Select" buttons
             await $('.select-btn').on('click', async function () {
-                const labels_set= $(this).data('labels_set');
-                const title = $(this).data('title');
-                const authors = $(this).data('authors');
-                const year = $(this).data('year');
-                const isbn = $(this).data('isbn');
-                const searchTerms = query
-                const searchBeginTime = $('#initial-input-timestamp').val();
-                const searchEndTime = new Date().toISOString();
+                const labels_set = $(this).data('labels_set');
+                selectedTitle = $(this).data('title');
+                selectedAuthors = $(this).data('authors');
 
-                await submitSelectedResult(
-                    labels_set,
-                    title,
-                    authors,
-                    year,
-                    isbn,
-                    searchTerms,
-                    searchBeginTime,
-                    searchEndTime,
-                );
+                switch (labels_set) {
+                    case 'a':
+                        isBookFoundA = true;
+                        break;
+                    case 'b':
+                        isBookFoundB = true;
+                        break;
+                }
+
                 // Indicate that book is now found for these labels
                 $('#results-' + labels_set).hide();
                 $('#results-book-found-' + labels_set).show();
-                await generateBooksTable();
             });
         });
 
-        $('#abandon-modal').on('shown.bs.modal', function () {
+        $('#proceed-modal').on('shown.bs.modal', function () {
             $('#title').focus();
         })
 
-        $('#abandon-form').on('submit', async function (event) {
+        // The form is needed when the book is not known, i.e. found neither in labels A or B
+        $('#proceed-form').on('submit', async function (event) {
             event.preventDefault();
-            const formData = new FormData();
             const title = $('input[name="title"]').val();
             const authors = $('input[name="authors"]').val();
-            const searchBeginTime = $('#initial-input-timestamp').val();
-            const abandonTime = new Date().toISOString();
+            submitBook(title, authors, false, false);
+            $('#proceed-modal').modal('hide');
+        });
 
+        async function submitBook(title, authors, isBookFoundA, isBookFoundB) {
+            const formData = new FormData();
             formData.append('title', title);
             formData.append('authors', authors);
-            formData.append('search_begin_time_utc', searchBeginTime)
-            formData.append('abandonTime', abandonTime);
 
-            await fetch("{{ url_for('abandon_fn', labels_set=request.view_args['labels_set']) }}", {
+            const searchBeginTime = $('#initial-input-timestamp').val();
+            const searchEndTime = new Date().toISOString();
+            formData.append('search_begin_time_utc', searchBeginTime)
+            formData.append('searchEndTime', searchEndTime);
+            formData.append('isBookFoundA', isBookFoundA);
+            formData.append('isBookFoundB', isBookFoundB);
+
+            await fetch("{{ url_for('proceed_fn') }}", {
                 method: 'POST',
                 body: formData
             }).then(response => {
                 // Handle response as needed
             }).catch(error => {
-                console.error('Error abandoning result:', error);
+                console.error('Error proceeding result:', error);
             });
-            $('#abandon-modal').modal('hide');
+
             // Clear search results
             $('.results').empty();
             // Clear the search input field
@@ -156,11 +161,11 @@
             $('#authors').val('');
             // Disable search button
             $("#search-btn").prop('disabled', true);
-            // Again show results
+            // Again show A &B results for upcoming searches
             $('.results').show();
             $('.results-book-found').hide();
             await generateBooksTable();
-        });
+        }
 
         async function searchLabels(query, labels_set) {
             const response = await fetch(`/search/${labels_set}?q=${query}`);
@@ -194,27 +199,6 @@
             }
         }
 
-        async function submitSelectedResult(labels_set, title, authors, year, isbn, searchTerms, searchBeginTime, searchEndTime) {
-            const formData = new FormData();
-            formData.append('labels_set', labels_set);
-            formData.append('title', title);
-            formData.append('authors', authors);
-            formData.append('year', year);
-            formData.append('isbn', isbn);
-            formData.append('search_terms', searchTerms);
-            formData.append('search_begin_time_utc', searchBeginTime);
-            formData.append('search_end_time_utc', searchEndTime);
-
-            await fetch("/select", {
-                method: 'POST',
-                body: formData
-            }).then(response => {
-                // Handle response as needed
-            }).catch(error => {
-                console.error('Error selecting result:', error);
-            });
-        }
-
         function split(val) {
             return val.split(/,\s*/);
         }
@@ -226,7 +210,7 @@
 
         $(document).ready(function () {
             // Fetch and display selected books when the page loads
-            generateBooksTable()
+            generateBooksTable();
             $('.results-book-found').hide();
 
             let initialInputTimestamp;
@@ -276,6 +260,20 @@
                         return false;
                     },
                 });
+
+            $('#proceed-btn').click(function() {
+                if (isBookFoundA || isBookFoundB) {
+                    // Book already known
+                    submitBook(selectedTitle, selectedAuthors, isBookFoundA, isBookFoundB);
+                } else {
+                    // Book not known, user needs to enter title and authors
+                    $('#proceed-modal').modal('show');
+                }
+                isBookFoundA = false;
+                isBookFoundB = false;
+                selectedAuthors = undefined;
+                selectedTitle = undefined;
+            });
 
         });
 

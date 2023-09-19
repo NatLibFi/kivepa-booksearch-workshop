@@ -12,7 +12,8 @@ async function generateBooksTable() {
                 <th>#</th>
                 <th>Title</th>
                 <th>Author(s)</th>
-                <th>Is found</th>
+                <th>Is found A</th>
+                <th>Is found B</th>
             </tr>
         `);
         table.append(tableHead);
@@ -25,7 +26,8 @@ async function generateBooksTable() {
                 <td>${rowNumber}</td>
                 <td>${book.title}</td>
                 <td>${book.authors}</td>
-                <td>${book.is_found}</td>
+                <td>${book.is_found_a}</td>
+                <td>${book.is_found_b}</td>
             `);
             table.append(row);
 
