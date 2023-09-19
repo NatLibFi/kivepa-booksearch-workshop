@@ -24,10 +24,10 @@
                 <input type="hidden" id="initial-input-timestamp" name="initial_input_timestamp" value="">
                 <button type="submit" id="search-btn" class="btn btn-primary" disabled>Search</button>
             </form>
-            <!-- Button to give up searching the book -->
+            <!-- Button to proceed to next book -->
             <button type="button" id="abandon-btn" class="btn btn-danger" data-toggle="modal"
                 data-target="#abandon-modal">
-                Book cannot be found, proceed to next book!
+                Proceed to next book!
             </button>
 
             <!-- Book abandoning Modal -->
@@ -184,7 +184,7 @@
                             <p><strong>Author(s):</strong> ${result.authors}</p>
                             <p><strong>Year:</strong> ${result.year}</p>
                             <p><strong>ISBN:</strong> ${result.isbn}</p>
-                            <button class="select-btn btn btn-success" data-labels_set="${labels_set}" data-title="${result.title}" data-authors="${result.authors}" data-year="${result.year}" data-isbn="${result.isbn}">Select and new search</button>
+                            <button class="select-btn btn btn-success" data-labels_set="${labels_set}" data-title="${result.title}" data-authors="${result.authors}" data-year="${result.year}" data-isbn="${result.isbn}">Select</button>
                         </div>
                     `);
                     resultsDiv.append(resultDiv);
