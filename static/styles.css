@@ -110,7 +110,9 @@ button:disabled {
     max-width: 500px;
     margin: 0 auto;
 }
-
+.results-book-found {
+    text-align: center;
+}
 .result {
     display: flex;
     align-items: center;

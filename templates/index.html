@@ -61,11 +61,17 @@
                         <div class="results" id="results-a">
                             <!-- Search results will be displayed here -->
                         </div>
+                        <div class="results-book-found" id="results-book-found-a">
+                            Book found in here!
+                        </div>
                     </div>
                     <div class="col-6">
                         <h3>Labels B</h2>
                         <div class="results" id="results-b">
                             <!-- Search results will be displayed here -->
+                        </div>
+                        <div class="results-book-found" id="results-book-found-b">
+                            Book found in here!
                         </div>
                     </div>
                 </div>
@@ -84,7 +90,7 @@
 
             const query = $('input[name="q"]').val();
 
-            await searchLabels(query, 'a');
+            await searchLabels(query, 'a');  // TODO Skip searching, if already found from labels A or B
             await searchLabels(query, 'b');
 
             // Attach event listeners to the "Select" buttons
@@ -108,12 +114,9 @@
                     searchBeginTime,
                     searchEndTime,
                 );
-                // Clear search results
-                // $('.results').empty();
-                // Clear the search input field
-                // $('#search-input').val('');
-                // Disable search button
-                // $("#search-btn").prop('disabled', true);
+                // Indicate that book is now found for these labels
+                $('#results-' + labels_set).hide();
+                $('#results-book-found-' + labels_set).show();
                 await generateBooksTable();
             });
         });
@@ -153,6 +156,9 @@
             $('#authors').val('');
             // Disable search button
             $("#search-btn").prop('disabled', true);
+            // Again show results
+            $('.results').show();
+            $('.results-book-found').hide();
             await generateBooksTable();
         });
 
@@ -221,6 +227,7 @@
         $(document).ready(function () {
             // Fetch and display selected books when the page loads
             generateBooksTable()
+            $('.results-book-found').hide();
 
             let initialInputTimestamp;
 
