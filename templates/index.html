@@ -191,6 +191,7 @@
 
             $('#search-form').on('submit', async function (event) {
                 event.preventDefault();
+                $('.results').empty();
 
                 const query = $('input[name="q"]').val();
                 if (!isBookFoundA) {
