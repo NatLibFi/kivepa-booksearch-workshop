@@ -88,6 +88,8 @@
         var searchCount = 0;
         var searchCountA;
         var searchCountB;
+        var searchTermsA;
+        var searchTermsB;
         var foundTimeA;
         var foundTimeB;
         var searchBeginTime;
@@ -113,11 +115,13 @@
                         isBookFoundA = true;
                         foundTimeA = new Date().toISOString();
                         searchCountA = searchCount;
+                        searchTermsA = query;
                         break;
                     case 'b':
                         isBookFoundB = true;
                         foundTimeB = new Date().toISOString();
                         searchCountB = searchCount;
+                        searchTermsB = query;
                         break;
                 }
 
@@ -149,6 +153,9 @@
 
             formData.append('searchCountA', searchCountA);
             formData.append('searchCountB', searchCountB);
+
+            formData.append('searchTermsA', searchTermsA);
+            formData.append('searchTermsB', searchTermsB);
 
             const searchEndTime = new Date().toISOString();
             formData.append('searchBeginTimeUtc', searchBeginTime)
@@ -287,6 +294,8 @@
                 searchCount = 0;
                 searchCountA = undefined;
                 searchCountB = undefined;
+                searchTermsA = undefined;
+                searchTermsB = undefined;
                 foundTimeA = undefined;
                 foundTimeB = undefined;
                 selectedAuthors = undefined;
