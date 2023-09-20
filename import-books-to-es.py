@@ -1,3 +1,4 @@
+import csv
 import gzip
 import json
 import sys
@@ -6,17 +7,27 @@ from time import sleep
 import requests
 from elasticsearch import Elasticsearch, helpers
 
+# Files to read data from
+BOOKS_FILE = "ks-bib.json.gz"
+ANNIF_SUBJECTS_FILE = (
+    "annif-subjects.json"  # work-uris as keys, subjects-uris as values
+)
+KOKO_TO_KAUNO_FILE = "koko_to_kauno_yso.csv"
+
+# The Elasticsearch index name
+index_name = "books"
+
+# Endpoint for querying labels of uris
+FINTO_API_QUERY_BASE = "https://api.finto.fi/rest/v1/label"
+
+
 # Connect to Elasticsearch
 if len(sys.argv) > 1:
     es_url = sys.argv[1]
 else:
     es_url = "http://localhost:9200"
 es = Elasticsearch(es_url)
-
-# Define the index name
-index_name = "books"
-
-FINTO_API_QUERY_BASE = "https://api.finto.fi/rest/v1/label"
+print(f"Connected to Elasticsearch at: {es_url}")
 
 
 def parse_book_json(book):
@@ -46,14 +57,19 @@ def resolve_uris_to_labels(uris):
 
 
 # Read books from file
-with gzip.open("ks-bib.json.gz", "rt") as books_file:
+with gzip.open(BOOKS_FILE, "rt") as books_file:
     books = json.loads(books_file.read())["results"]["bindings"]
 print(f"Read {len(books)} books from file")
 
-
-with open("annif-subjects.json", "rt") as as_file:
-    books_annif_subjects = json.loads(as_file.read())
+with open(ANNIF_SUBJECTS_FILE, "rt") as subjs_file:
+    books_annif_subjects = json.loads(subjs_file.read())
 print(f"Read annif subjects for {len(books_annif_subjects)} books")
+
+subjects_map = {}
+with open(KOKO_TO_KAUNO_FILE, "r") as mapping_file:
+    csv_reader = csv.reader(mapping_file)
+    for row in csv_reader:
+        subjects_map[row[0]] = row[1]
 
 
 # Define the index mapping
@@ -97,6 +113,18 @@ for book_json in books:
     # Skip importing duplicates
     if book["work-uri"] in loaded_books:
         skipped += 1
+        continue
+
+    # Map KOKO uris to KAUNO uris
+    try:
+        book["subjects-a-uris"] = [
+            subjects_map[kauno_uri] for kauno_uri in book["subjects-a-uris"]
+        ]
+    except KeyError as err:
+        print(f"Failed mapping subjects - Key not found: {err}")
+        print(f'Book title: {book["title"]}')
+        print()
+        errored += 1
         continue
 
     try:
