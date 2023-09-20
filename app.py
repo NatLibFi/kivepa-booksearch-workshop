@@ -33,8 +33,8 @@ def create_table(cursor):
             search_terms_a TEXT,
             search_terms_b TEXT,
             search_begin_time_utc TEXT,
-            found_a_time_utc TEXT,
-            found_b_time_utc TEXT,
+            found_time_utc_a TEXT,
+            found_time_utc_b TEXT,
             search_end_time_utc TEXT,
             uid TEXT
         )
@@ -59,14 +59,13 @@ def proceed_fn():
     is_found_b = request.form.get("isBookFoundB")
     search_count_a = 42  # TODO
     search_count_b = 42  # TODO
-    search_terms_a = 'jotain'  # TODO
-    search_terms_b = 'jotain muuta'  # TODO
-    found_a_time_utc = '1234'
-    found_b_time_utc = '1234'
-    search_begin_time_utc = request.form.get("search_begin_time_utc")
-    search_end_time_utc = request.form.get("search_end_time_utc")
+    search_terms_a = "jotain"  # TODO
+    search_terms_b = "jotain muuta"  # TODO
+    search_begin_time_utc = request.form.get("searchBeginTimeUtc")
+    search_end_time_utc = request.form.get("searchEndTimeUtc")
+    found_time_utc_a = request.form.get("foundTimeA")
+    found_time_utc_b = request.form.get("foundTimeB")
     uid = str(session["uid"])
-    print(f"Book not found: {title} - {authors}")
 
     # Connect to the SQLite database
     with sqlite3.connect(sqlite3_db_path) as connection:
@@ -87,8 +86,8 @@ def proceed_fn():
                 search_terms_a,
                 search_terms_b,
                 search_begin_time_utc,
-                found_a_time_utc,
-                found_b_time_utc,
+                found_time_utc_a,
+                found_time_utc_b,
                 search_end_time_utc,
                 uid
                 )
@@ -104,8 +103,8 @@ def proceed_fn():
                 search_terms_a,
                 search_terms_b,
                 search_begin_time_utc,
-                found_a_time_utc,
-                found_b_time_utc,
+                found_time_utc_a,
+                found_time_utc_b,
                 search_end_time_utc,
                 uid,
             ),

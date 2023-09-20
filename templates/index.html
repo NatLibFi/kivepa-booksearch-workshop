@@ -21,7 +21,6 @@
             <!-- Search form -->
             <form id="search-form" method="get">
                 <input type="text" id="search-input" name="q" placeholder="Enter book subject(s)" size="70">
-                <input type="hidden" id="initial-input-timestamp" name="initial_input_timestamp" value="">
                 <button type="submit" id="search-btn" class="btn btn-primary" disabled>Search</button>
             </form>
             <!-- Button to proceed to next book -->
@@ -86,6 +85,9 @@
     <script>
         var isBookFoundA = false;
         var isBookFoundB = false;
+        var foundTimeA;
+        var foundTimeB;
+        var searchBeginTime;
         var selectedTitle;
         var selectedAuthors;
 
@@ -106,9 +108,11 @@
                 switch (labels_set) {
                     case 'a':
                         isBookFoundA = true;
+                        foundTimeA = new Date().toISOString();
                         break;
                     case 'b':
                         isBookFoundB = true;
+                        foundTimeB = new Date().toISOString();
                         break;
                 }
 
@@ -135,13 +139,14 @@
             const formData = new FormData();
             formData.append('title', title);
             formData.append('authors', authors);
-
-            const searchBeginTime = $('#initial-input-timestamp').val();
-            const searchEndTime = new Date().toISOString();
-            formData.append('search_begin_time_utc', searchBeginTime)
-            formData.append('searchEndTime', searchEndTime);
             formData.append('isBookFoundA', isBookFoundA);
             formData.append('isBookFoundB', isBookFoundB);
+
+            const searchEndTime = new Date().toISOString();
+            formData.append('searchBeginTimeUtc', searchBeginTime)
+            formData.append('searchEndTimeUtc', searchEndTime);
+            formData.append('foundTimeA', foundTimeA);
+            formData.append('foundTimeB', foundTimeB);
 
             await fetch("{{ url_for('proceed_fn') }}", {
                 method: 'POST',
@@ -164,6 +169,8 @@
             // Again show A &B results for upcoming searches
             $('.results').show();
             $('.results-book-found').hide();
+
+            searchBeginTime = undefined;  // Why this needs to be here instead of in listener?
             await generateBooksTable();
         }
 
@@ -213,15 +220,12 @@
             generateBooksTable();
             $('.results-book-found').hide();
 
-            let initialInputTimestamp;
-
             $('#search-input')
                 .on('input', function () {
                     $("#search-btn").prop('disabled', true);
                     // Capture the initial input timestamp when the user starts typing
-                    if (!initialInputTimestamp) {
-                        initialInputTimestamp = new Date().toISOString();
-                        $('#initial-input-timestamp').val(initialInputTimestamp);
+                    if (!searchBeginTime) {
+                        searchBeginTime = new Date().toISOString();
                     }
                 })
                 .autocomplete({
@@ -271,6 +275,8 @@
                 }
                 isBookFoundA = false;
                 isBookFoundB = false;
+                foundTimeA = undefined;
+                foundTimeB = undefined;
                 selectedAuthors = undefined;
                 selectedTitle = undefined;
             });
