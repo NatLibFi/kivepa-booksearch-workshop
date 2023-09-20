@@ -83,6 +83,7 @@
     <script src="/static/table.js"></script>
 
     <script>
+        // Initialize monitoring variables
         var isBookFoundA = false;
         var isBookFoundB = false;
         var searchCount = 0;
@@ -96,66 +97,8 @@
         var selectedTitle;
         var selectedAuthors;
 
-        $('#search-form').on('submit', async function (event) {
-            event.preventDefault();
-
-            const query = $('input[name="q"]').val();
-            await searchLabels(query, 'a');  // TODO Skip searching, if already found from labels A or B
-            await searchLabels(query, 'b');
-            searchCount++;
-
-            // Attach event listeners to the "Select" buttons
-            await $('.select-btn').on('click', async function () {
-                selectedTitleNew = $(this).data('title');
-                selectedAuthorsNew = $(this).data('authors');
-                if (typeof selectedTitle !== 'undefined' && selectedTitleNew != selectedTitle) {
-                    alert('Different selections!')
-                }
-
-                const labels_set = $(this).data('labels_set');
-                selectedTitle = $(this).data('title');
-                selectedAuthors = $(this).data('authors');
-
-                switch (labels_set) {
-                    case 'a':
-                        isBookFoundA = true;
-                        foundTimeA = new Date().toISOString();
-                        searchCountA = searchCount;
-                        searchTermsA = query;
-                        break;
-                    case 'b':
-                        isBookFoundB = true;
-                        foundTimeB = new Date().toISOString();
-                        searchCountB = searchCount;
-                        searchTermsB = query;
-                        break;
-                }
-
-                // Indicate that book is now found for these labels
-                $('#results-' + labels_set).hide();
-                $('#results-book-found-' + labels_set).show();
-
-                if (isBookFoundA && isBookFoundB) {
-                    // No need to search anymore, disable search button
-                    $("#search-btn").prop('disabled', true);
-                }
-            });
-        });
-
-        $('#proceed-modal').on('shown.bs.modal', function () {
-            $('#title').focus();
-        })
-
-        // The form is needed when the book is not known, i.e. found neither in labels A or B
-        $('#proceed-form').on('submit', async function (event) {
-            event.preventDefault();
-            const title = $('input[name="title"]').val();
-            const authors = $('input[name="authors"]').val();
-            submitBook(title, authors, false, false);
-            $('#proceed-modal').modal('hide');
-        });
-
         async function submitBook(title, authors, isBookFoundA, isBookFoundB) {
+            // Submit data about the search when proceeding to next book
             const formData = new FormData();
             formData.append('title', title);
             formData.append('authors', authors);
@@ -246,6 +189,65 @@
             generateBooksTable();
             $('.results-book-found').hide();
 
+            $('#search-form').on('submit', async function (event) {
+                event.preventDefault();
+
+                const query = $('input[name="q"]').val();
+                await searchLabels(query, 'a');  // TODO Skip searching, if already found from labels A or B
+                await searchLabels(query, 'b');
+                searchCount++;
+
+                // Attach event listeners to the "Select" buttons
+                await $('.select-btn').on('click', async function () {
+                    selectedTitleNew = $(this).data('title');
+                    selectedAuthorsNew = $(this).data('authors');
+                    if (typeof selectedTitle !== 'undefined' && selectedTitleNew != selectedTitle) {
+                        alert('Different selections!')
+                    }
+
+                    const labels_set = $(this).data('labels_set');
+                    selectedTitle = $(this).data('title');
+                    selectedAuthors = $(this).data('authors');
+
+                    switch (labels_set) {
+                        case 'a':
+                            isBookFoundA = true;
+                            foundTimeA = new Date().toISOString();
+                            searchCountA = searchCount;
+                            searchTermsA = query;
+                            break;
+                        case 'b':
+                            isBookFoundB = true;
+                            foundTimeB = new Date().toISOString();
+                            searchCountB = searchCount;
+                            searchTermsB = query;
+                            break;
+                    }
+
+                    // Indicate that book is now found for these labels
+                    $('#results-' + labels_set).hide();
+                    $('#results-book-found-' + labels_set).show();
+
+                    if (isBookFoundA && isBookFoundB) {
+                        // No need to search anymore, disable search button
+                        $("#search-btn").prop('disabled', true);
+                    }
+                });
+            });
+
+            // The proceed modal and form is needed when the book is
+            // not known, i.e. found neither in labels A and B
+            $('#proceed-modal').on('shown.bs.modal', function () {
+                $('#title').focus();
+            })
+            $('#proceed-form').on('submit', async function (event) {
+                event.preventDefault();
+                const title = $('input[name="title"]').val();
+                const authors = $('input[name="authors"]').val();
+                submitBook(title, authors, false, false);
+                $('#proceed-modal').modal('hide');
+            });
+
             $('#search-input')
                 .on('input', function () {
                     $("#search-btn").prop('disabled', true);
@@ -300,6 +302,7 @@
                     $('#proceed-modal').modal('show');
                 }
 
+                // Reset monitoring variables
                 isBookFoundA = false;
                 isBookFoundB = false;
                 searchCount = 0;
