@@ -134,6 +134,11 @@
                 // Indicate that book is now found for these labels
                 $('#results-' + labels_set).hide();
                 $('#results-book-found-' + labels_set).show();
+
+                if (isBookFoundA && isBookFoundB) {
+                    // No need to search anymore, disable search button
+                    $("#search-btn").prop('disabled', true);
+                }
             });
         });
 
