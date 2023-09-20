@@ -106,6 +106,12 @@
 
             // Attach event listeners to the "Select" buttons
             await $('.select-btn').on('click', async function () {
+                selectedTitleNew = $(this).data('title');
+                selectedAuthorsNew = $(this).data('authors');
+                if (typeof selectedTitle !== 'undefined' && selectedTitleNew != selectedTitle) {
+                    alert('Different selections!')
+                }
+
                 const labels_set = $(this).data('labels_set');
                 selectedTitle = $(this).data('title');
                 selectedAuthors = $(this).data('authors');
