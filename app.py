@@ -57,8 +57,8 @@ def proceed_fn():
     authors = request.form.get("authors")
     is_found_a = request.form.get("isBookFoundA")
     is_found_b = request.form.get("isBookFoundB")
-    search_count_a = 42  # TODO
-    search_count_b = 42  # TODO
+    search_count_a = request.form.get("searchCountA")
+    search_count_b = request.form.get("searchCountB")
     search_terms_a = "jotain"  # TODO
     search_terms_b = "jotain muuta"  # TODO
     search_begin_time_utc = request.form.get("searchBeginTimeUtc")

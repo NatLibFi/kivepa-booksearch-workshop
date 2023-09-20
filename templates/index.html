@@ -85,6 +85,9 @@
     <script>
         var isBookFoundA = false;
         var isBookFoundB = false;
+        var searchCount = 0;
+        var searchCountA;
+        var searchCountB;
         var foundTimeA;
         var foundTimeB;
         var searchBeginTime;
@@ -95,9 +98,9 @@
             event.preventDefault();
 
             const query = $('input[name="q"]').val();
-
             await searchLabels(query, 'a');  // TODO Skip searching, if already found from labels A or B
             await searchLabels(query, 'b');
+            searchCount++;
 
             // Attach event listeners to the "Select" buttons
             await $('.select-btn').on('click', async function () {
@@ -109,10 +112,12 @@
                     case 'a':
                         isBookFoundA = true;
                         foundTimeA = new Date().toISOString();
+                        searchCountA = searchCount;
                         break;
                     case 'b':
                         isBookFoundB = true;
                         foundTimeB = new Date().toISOString();
+                        searchCountB = searchCount;
                         break;
                 }
 
@@ -141,6 +146,9 @@
             formData.append('authors', authors);
             formData.append('isBookFoundA', isBookFoundA);
             formData.append('isBookFoundB', isBookFoundB);
+
+            formData.append('searchCountA', searchCountA);
+            formData.append('searchCountB', searchCountB);
 
             const searchEndTime = new Date().toISOString();
             formData.append('searchBeginTimeUtc', searchBeginTime)
@@ -273,8 +281,12 @@
                     // Book not known, user needs to enter title and authors
                     $('#proceed-modal').modal('show');
                 }
+
                 isBookFoundA = false;
                 isBookFoundB = false;
+                searchCount = 0;
+                searchCountA = undefined;
+                searchCountB = undefined;
                 foundTimeA = undefined;
                 foundTimeB = undefined;
                 selectedAuthors = undefined;
