@@ -46,7 +46,6 @@ def create_table(cursor):
 def index():
     if "uid" not in session:
         session["uid"] = uuid.uuid4()
-    session["search_count"] = 0
     print(f"User {session['uid']}")
     return render_template("index.html")
 
@@ -178,8 +177,6 @@ def search_fn(labels_set):
                 "isbn": 9789512423514,  # TODO Replace with real isbn
             }
             results.append(result)
-        session["search_count"] += 1
-        print(f"Search count is {session['search_count']}")
         return jsonify({"results_count": hits_count, "results": results})
     except Exception as e:
         return jsonify({"error": str(e)}), 500
