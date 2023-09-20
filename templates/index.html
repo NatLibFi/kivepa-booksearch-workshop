@@ -193,8 +193,12 @@
                 event.preventDefault();
 
                 const query = $('input[name="q"]').val();
-                await searchLabels(query, 'a');  // TODO Skip searching, if already found from labels A or B
-                await searchLabels(query, 'b');
+                if (!isBookFoundA) {
+                    await searchLabels(query, 'a');
+                }
+                if (!isBookFoundB) {
+                    await searchLabels(query, 'b');
+                }
                 searchCount++;
 
                 // Attach event listeners to the "Select" buttons
