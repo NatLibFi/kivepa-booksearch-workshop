@@ -76,14 +76,14 @@ with open(KOKO_TO_KAUNO_FILE, "r") as mapping_file:
 index_mapping = {
     "mappings": {
         "properties": {
-            "work-uri": {"type": "text"},
-            "authors": {"type": "text"},
-            "title": {"type": "text"},
-            "isbn": {"type": "text"},
-            "year": {"type": "text"},
-            "subjects-a-uris": {"type": "text"},
+            "work-uri": {"type": "keyword"},
+            "authors": {"type": "keyword"},
+            "title": {"type": "keyword"},
+            "isbn": {"type": "integer"},
+            "year": {"type": "integer"},
+            "subjects-a-uris": {"type": "keyword"},
             "subjects-a-labels": {"type": "keyword"},
-            "subjects-b-uris": {"type": "text"},
+            "subjects-b-uris": {"type": "keyword"},
             "subjects-b-labels": {"type": "keyword"},
         }
     }
