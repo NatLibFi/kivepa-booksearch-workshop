@@ -4,6 +4,11 @@ from time import sleep
 
 from annif_client import AnnifClient
 
+BOOKS_FILE = "ks-bib.json.gz"  # File to read data from
+ANNIF_SUBJECTS_FILE = "annif-subjects.json"  # File to save subjects to
+ANNIF_API_BASE = "https://dev.annif.org/v1/"
+PROJECT_ID = "kauno-ensemble-fi"
+
 
 def parse_book_json(book):
     document = {}
@@ -22,13 +27,10 @@ def annif_suggest(text):
     return [res["uri"] for res in results]
 
 
-ANNIF_API_BASE = "https://ai.dev.finto.fi/v1/"
-PROJECT_ID = "kauno-ensemble-fi"
-
 annif = AnnifClient(api_base=ANNIF_API_BASE)
 
 # Read books from file
-with gzip.open("ks-bib.json.gz", "rt") as books_file:
+with gzip.open(BOOKS_FILE, "rt") as books_file:
     books = json.loads(books_file.read())["results"]["bindings"]
 print(f"Read {len(books)} books from file")
 
@@ -64,7 +66,7 @@ for book_json in books:
 
 print(f"Saving annif subjects for {len(books_annif_subjects)} books")
 # Save subjects to a file
-with open("annif-subjects.json", "w") as outfile:
+with open(ANNIF_SUBJECTS_FILE, "w") as outfile:
     json.dump(books_annif_subjects, outfile)
 
 print(f"Number of books skipped: {errored}")
