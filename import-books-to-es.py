@@ -8,9 +8,9 @@ import requests
 from elasticsearch import Elasticsearch, helpers
 
 # Files to read data from
-BOOKS_FILE = "ks-bib.json.gz"
+BOOKS_FILE = "ks-bib-for-kivepa-prototype.json.gz"
 ANNIF_SUBJECTS_FILE = (
-    "annif-subjects.json"  # work-uris as keys, subjects-uris as values
+    "annif-subjects-2023.json"  # work-uris as keys, subjects-uris as values
 )
 KOKO_TO_KAUNO_FILE = "koko_to_kauno_yso.csv"
 
@@ -33,11 +33,15 @@ print(f"Connected to Elasticsearch at: {es_url}")
 def parse_book_json(book):
     document = {}
     document["work-uri"] = book["work"]["value"]
-    document["subjects-a-uris"] = book["themes"]["value"].split()
+    themes = book.get("themes", {}).get("value", "").split()
+    agents = book.get("agents", {}).get("value", "").split()
+    places = book.get("places", {}).get("value", "").split()
+    # Times and subjects fields are not present in json file
+    document["subjects-a-uris"] = themes + agents + places
     document["title"] = book["title"]["value"]
     document["authors"] = book["authorNames"]["value"]
-    document["isbn"] = "1234"  # TODO Needs to adjust the SPARQL
-    document["year"] = book["pubLabel"]["value"]
+    document["isbn"] = book["isbn"]["value"]
+    document["year"] = book["minPublished"]["value"]
     return document
 
 
@@ -98,16 +102,19 @@ loaded_books = set()
 errored = 0
 skipped = 0
 for book_json in books:
-    # if len(loaded_books) >= 8000:  # TMP, for getting small dev set
+    # if len(loaded_books) >= 10:  # TMP, for getting small dev set
     #     break
 
     try:
         book = parse_book_json(book_json)  # to be imported to Elasticsearch
     except KeyError as err:
-        print(f"Failed parsing book - Key not found: {err}")
-        print(book_json)
-        print()
+        print(
+            f"Failed parsing book - Key not found: {err}\n{book_json}\n",
+        )
         errored += 1
+        continue
+
+    if book["year"] != "2023":
         continue
 
     # Skip importing duplicates
@@ -121,33 +128,33 @@ for book_json in books:
             subjects_map[kauno_uri] for kauno_uri in book["subjects-a-uris"]
         ]
     except KeyError as err:
-        print(f"Failed mapping subjects - Key not found: {err}")
-        print(f'Book title: {book["title"]}')
-        print()
+        print(
+            f"Failed mapping subjects - Key not found: {err}\nBook title: {book['title']}",
+        )
         errored += 1
         continue
 
     try:
         book["subjects-b-uris"] = books_annif_subjects[book["work-uri"]]
     except KeyError as err:
-        print(f"Failed getting Annif subjects - Key not found: {err}")
-        print(f'Book title: {book["title"]}')
-        print()
+        print(
+            f"Failed getting Annif subjects - Key not found: {err}\nBook title: {book['title']}",
+        )
         errored += 1
         continue
     try:
         book["subjects-a-labels"] = resolve_uris_to_labels(book["subjects-a-uris"])
     except Exception as err:
-        print("URI resolving failed for set A")
-        print(f'Book title: {book["title"]}')
-        print(err)
+        print(
+            f"URI resolving failed for set A\nBook title: {book['title']}\n{err}",
+        )
         continue
     try:
         book["subjects-b-labels"] = resolve_uris_to_labels(book["subjects-b-uris"])
     except Exception as err:
-        print("URI resolving failed for set B")
-        print(f'Book title: {book["title"]}')
-        print(err)
+        print(
+            f"URI resolving failed for set B\nBook title: {book['title']}\n{err}",
+        )
         continue
 
     action = {"_index": index_name, "_source": book}

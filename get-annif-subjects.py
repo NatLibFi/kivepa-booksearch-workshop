@@ -4,7 +4,7 @@ from time import sleep
 
 from annif_client import AnnifClient
 
-BOOKS_FILE = "ks-bib.json.gz"  # File to read data from
+BOOKS_FILE = "ks-bib-for-kivepa-prototype.json.gz"
 ANNIF_SUBJECTS_FILE = "annif-subjects.json"  # File to save subjects to
 ANNIF_API_BASE = "https://dev.annif.org/v1/"
 PROJECT_ID = "kauno-ensemble-fi"
@@ -13,12 +13,10 @@ PROJECT_ID = "kauno-ensemble-fi"
 def parse_book_json(book):
     document = {}
     document["work-uri"] = book["work"]["value"]
-    document["subjects-a-uris"] = book["themes"]["value"].split()
     document["title"] = book["title"]["value"]
     document["authors"] = book["authorNames"]["value"]
     document["desc"] = book["desc"]["value"]
-    document["isbn"] = "1234"  # TODO Needs to adjust the SPARQL
-    document["year"] = book["pubLabel"]["value"]
+    document["year"] = book["minPublished"]["value"]
     return document
 
 
@@ -34,6 +32,11 @@ with gzip.open(BOOKS_FILE, "rt") as books_file:
     books = json.loads(books_file.read())["results"]["bindings"]
 print(f"Read {len(books)} books from file")
 
+# Order by year, descending
+# books = sorted(
+#     books, key=lambda x: x.get("pubLabel", {}).get("value", "0001"), reverse=True
+# )
+
 
 books_annif_subjects = dict()
 errored = 0
@@ -44,6 +47,9 @@ for book_json in books:
     except KeyError as err:
         print(f"Key not found: {err}")
         errored += 1
+        continue
+
+    if book["year"] != "2023":
         continue
 
     # Skip duplicates
