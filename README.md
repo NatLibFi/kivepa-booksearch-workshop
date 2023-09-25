@@ -7,9 +7,9 @@ Developed with help from ChatGPT.
     python3 -m venv venv
     source venv/bin/activate
     pip install -r requirements.txt
-    
-## Get subjects for books from Annif 
-    time python get-annif-subjects.py  # Takes ~5 hours for all books 
+
+## Get subjects for books from Annif
+    time python get-annif-subjects.py  # Takes ~5 hours for all books
 
 ## Local development
 ### Set up Elasticsearch and indices
@@ -18,7 +18,7 @@ Developed with help from ChatGPT.
     # curl -X DELETE "localhost:9200/books"  # Delete existing index
     time python import-books-to-es.py &> import-books.out  # Takes 5 min for 1000 books, 15 min for 4000 books, etc.
 
-    # curl -X DELETE "localhost:9200/labels"  # Delete existing index
+    # curl -X DELETE "localhost:9200/autocomplete"  # Delete existing index
     python create-autocomplete-index.py
 #### Alternatively use Elasticsearch running in OpenShift
     export ELASTICSEARCH_URL=https://kvp-2023-workshop-elasticsearch.apps.kk-test.k8s.it.helsinki.fi:443
@@ -37,7 +37,7 @@ The deploykey for the private repository containing the Dockerfile needs to be i
 ### Create indices
 
     # curl -X DELETE "https://kvp-2023-workshop-elasticsearch.apps.kk-test.k8s.it.helsinki.fi:443/books"  # Delete old
-    # curl -X DELETE "https://kvp-2023-workshop-elasticsearch.apps.kk-test.k8s.it.helsinki.fi:443/labels"  # Delete old
+    # curl -X DELETE "https://kvp-2023-workshop-elasticsearch.apps.kk-test.k8s.it.helsinki.fi:443/autocomplete"  # Delete old
 
     time python import-books-to-es.py https://kvp-2023-workshop-elasticsearch.apps.kk-test.k8s.it.helsinki.fi:443 &> import-books.out
     python create-autocomplete-index.py https://kvp-2023-workshop-elasticsearch.apps.kk-test.k8s.it.helsinki.fi:443
@@ -53,12 +53,12 @@ The deploykey for the private repository containing the Dockerfile needs to be i
     curl localhost:9200/books/_search?pretty -H "Content-Type: application/json" -d '{
       "query": {
         "match": {
-          "title": "Kissa"                 
+          "title": "Kissa"
         }
       }
     }'
 
-    
+
 
 ## TODO How to set up the Apache Jena for data preprocessing
 Needed for running SPARQL query to process the file [kirjasampo-bib.json-ld.gz](https://github.com/NatLibFi/Annif-corpora-restricted/blob/master/kirjasampo/kirjasampo-bib.json-ld.gz).

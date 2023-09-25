@@ -11,6 +11,8 @@ if len(sys.argv) > 1:
 else:
     es_url = "http://localhost:9200"
 es = Elasticsearch(es_url)
+print(f"Connected to Elasticsearch at: {es_url}")
+
 
 # First get the labels
 source_index_name = "books"
@@ -53,18 +55,23 @@ print(f"Number of labels: {len(labels)}")
 
 
 # Then create the new index
-labels_index_name = "labels"
+index_name = "autocomplete"
 labels_field_name = "label_suggest"
+# titles_field_name = "title_suggest"
 
 labels_index_mapping = {
-    "mappings": {"properties": {labels_field_name: {"type": "completion"}}}
+    "mappings": {
+        "properties": {
+            labels_field_name: {"type": "completion"},
+            # titles_field_name: {"type": "completion"},
+        }
+    }
 }
 
-es.indices.create(index=labels_index_name, body=labels_index_mapping)
+es.indices.create(index=index_name, body=labels_index_mapping)
 
 # Populate the new index
 actions = [
-    {"_index": labels_index_name, "_source": {labels_field_name: label}}
-    for label in labels
+    {"_index": index_name, "_source": {labels_field_name: label}} for label in labels
 ]
 helpers.bulk(es, actions)

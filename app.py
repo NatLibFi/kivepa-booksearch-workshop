@@ -120,7 +120,7 @@ def autocomplete():
     if not query:
         return jsonify([])
 
-    index = "labels"
+    index = "autocomplete"
     field = "label_suggest"
 
     body = {
