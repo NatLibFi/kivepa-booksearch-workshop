@@ -174,7 +174,7 @@ def search_fn(labels_set):
                 "authors": source.get("authors", "N/A"),
                 "year": source.get("year", "N/A"),
                 "score": hit["_score"],
-                "isbn": 9789512423514,  # TODO Replace with real isbn
+                "isbn": source["isbn"],
             }
             results.append(result)
         return jsonify({"results_count": hits_count, "results": results})
