@@ -79,7 +79,7 @@ index_mapping = {
             "work-uri": {"type": "keyword"},
             "authors": {"type": "keyword"},
             "title": {"type": "keyword"},
-            "isbn": {"type": "integer"},
+            "isbn": {"type": "keyword"},
             "year": {"type": "integer"},
             "subjects-a-uris": {"type": "keyword"},
             "subjects-a-labels": {"type": "keyword"},
