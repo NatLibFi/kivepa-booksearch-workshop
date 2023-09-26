@@ -126,9 +126,11 @@ button:disabled {
 }
 
 .book-cover {
-    max-width: 100px;
+    width: 100px;
     height: auto;
     margin: 20px;
+    background-image: url('book-cover.svg');
+    background-size: 100% 100%;
 }
 
 .result-details {

@@ -158,6 +158,7 @@
             if (data.results) {
                 data.results.forEach(result => {
                     const resultDiv = $('<div>').addClass('result');
+                    // In css book-cover.svg is set as background image for book cover images not in Finna
                     resultDiv.html(`
                         <img src="${coverImageUrlBase}${result.isbn}" alt="Cover Image" class="book-cover">
                         <div class="result-details">
