@@ -205,8 +205,8 @@ def get_searched_books_fn():
                 {
                     "title": title,
                     "authors": authors,
-                    "is_found_a": is_found_a,
-                    "is_found_b": is_found_b,
+                    "is_found_a": is_found_a == "true",
+                    "is_found_b": is_found_b == "true",
                 }
             )
 

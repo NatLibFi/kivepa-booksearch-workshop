@@ -12,8 +12,8 @@ async function generateBooksTable() {
                 <th>#</th>
                 <th>Title</th>
                 <th>Author(s)</th>
-                <th>Is found A</th>
-                <th>Is found B</th>
+                <th>Found in A</th>
+                <th>Found in B</th>
             </tr>
         `);
         table.append(tableHead);
@@ -22,12 +22,17 @@ async function generateBooksTable() {
 
         data.searchedBooks.forEach(book => {
             const row = $('<tr>');
+            const isFoundAIcon = book.is_found_a ? '✓' : '✗';
+            const isFoundBIcon = book.is_found_b ? '✓' : '✗';
+            const isFoundAColor = book.is_found_a ? 'green' : 'red';
+            const isFoundBColor = book.is_found_b ? 'green' : 'red';
+
             row.html(`
                 <td>${rowNumber}</td>
                 <td>${book.title}</td>
                 <td>${book.authors}</td>
-                <td>${book.is_found_a}</td>
-                <td>${book.is_found_b}</td>
+                <td style="color: ${isFoundAColor}; font-size: 25px; text-align: center;">${isFoundAIcon}</td>
+                <td style="color: ${isFoundBColor}; font-size: 25px; text-align: center;">${isFoundBIcon}</td>
             `);
             table.append(row);
 
