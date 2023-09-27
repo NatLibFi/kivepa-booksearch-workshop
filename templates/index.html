@@ -54,23 +54,23 @@
             </div>
             <div class="container">
                 <div class="row">
-                    <div class="col-6">
-                        <h3>Labels A</h2>
-                            <div class="results" id="results-a">
-                                <!-- Search results will be displayed here -->
-                            </div>
-                            <div class="results-book-found" id="results-book-found-a">
-                                Book found in here!
-                            </div>
+                    <div class="col-6" id="results-a-column">
+                        <h3>Labels A</h3>
+                        <div class="results" id="results-a">
+                            <!-- Search results will be displayed here -->
+                        </div>
+                        <div class="results-book-found" id="results-book-found-a">
+                            Book found in here!
+                        </div>
                     </div>
-                    <div class="col-6">
-                        <h3>Labels B</h2>
-                            <div class="results" id="results-b">
-                                <!-- Search results will be displayed here -->
-                            </div>
-                            <div class="results-book-found" id="results-book-found-b">
-                                Book found in here!
-                            </div>
+                    <div class="col-6" id="results-b-column">
+                        <h3>Labels B</h3>
+                        <div class="results" id="results-b">
+                            <!-- Search results will be displayed here -->
+                        </div>
+                        <div class="results-book-found" id="results-book-found-b">
+                            Book found in here!
+                        </div>
                     </div>
                 </div>
             </div>
@@ -96,6 +96,9 @@
         var searchBeginTime;
         var selectedTitle;
         var selectedAuthors;
+
+        // Boolean to set the order of A and B columns
+        var reversed;
 
         async function submitBook(title, authors, isBookFoundA, isBookFoundB) {
             // Submit data about the search when proceeding to next book
@@ -140,7 +143,7 @@
             $('.results-book-found').hide();
 
             searchBeginTime = undefined;  // Why this needs to be here instead of in listener?
-            await generateBooksTable();
+            await generateBooksTable(reversed);
         }
 
         async function searchLabels(query, labels_set) {
@@ -186,8 +189,16 @@
         }
 
         $(document).ready(function () {
+            // Check the value of the "reversed" variable to determine the order
+            reversed = true; // Set to true or false based on your logic
+
+            if (reversed) {
+                // Move the right column to the left
+                $('#results-a-column').before($('#results-b-column'));
+            }
+
             // Fetch and display selected books when the page loads
-            generateBooksTable();
+            generateBooksTable(reversed);
             $('.results-book-found').hide();
 
             $('#search-form').on('submit', async function (event) {
