@@ -49,7 +49,7 @@ for book_json in books:
         errored += 1
         continue
 
-    if book["year"] != "2023":
+    if book["year"] < "2022":
         continue
 
     # Skip duplicates

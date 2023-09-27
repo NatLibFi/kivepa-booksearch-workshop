@@ -10,7 +10,7 @@ from elasticsearch import Elasticsearch, helpers
 # Files to read data from
 BOOKS_FILE = "ks-bib-for-kivepa-prototype.json.gz"
 ANNIF_SUBJECTS_FILE = (
-    "annif-subjects-2023.json"  # work-uris as keys, subjects-uris as values
+    "annif-subjects.json"  # work-uris as keys, subjects-uris as values
 )
 KOKO_TO_KAUNO_FILE = "koko_to_kauno_yso.csv"
 
@@ -118,7 +118,7 @@ for book_json in books:
         errored += 1
         continue
 
-    if book["year"] != "2023":
+    if book["year"] < "2022":
         continue
 
     # Skip importing duplicates
