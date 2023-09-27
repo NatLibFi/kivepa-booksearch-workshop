@@ -237,6 +237,8 @@
                     if (isBookFoundA && isBookFoundB) {
                         // No need to search anymore, disable search button
                         $("#search-btn").prop('disabled', true);
+                        $("#proceed-btn").removeClass('btn-danger');
+                        $("#proceed-btn").addClass('btn-success');
                     }
                 });
             });
@@ -307,6 +309,9 @@
                     // Book not known, user needs to enter title and authors
                     $('#proceed-modal').modal('show');
                 }
+
+                $("#proceed-btn").removeClass('btn-success');
+                $("#proceed-btn").addClass('btn-danger');
 
                 // Reset monitoring variables
                 isBookFoundA = false;
