@@ -36,12 +36,15 @@ def parse_book_json(book):
     themes = book.get("themes", {}).get("value", "").split()
     agents = book.get("agents", {}).get("value", "").split()
     places = book.get("places", {}).get("value", "").split()
-    # Times and subjects fields are not present in json file
-    document["subjects-a-uris"] = themes + agents + places
+    times = book.get("times", {}).get("value", "").split()
+    # TODO Add genres too?
+    # Subjects fields are not present in json file
+    document["subjects-a-uris"] = themes + agents + places + times
     document["title"] = book["title"]["value"]
     document["authors"] = book["authorNames"]["value"]
     document["isbn"] = book["isbn"]["value"]
     document["year"] = book["minPublished"]["value"]
+    document["desc"] = book["desc"]["value"]
     return document
 
 
@@ -89,6 +92,7 @@ index_mapping = {
             "subjects-a-labels": {"type": "keyword"},
             "subjects-b-uris": {"type": "keyword"},
             "subjects-b-labels": {"type": "keyword"},
+            "desc": {"type": "text"},
         }
     }
 }
