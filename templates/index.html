@@ -182,8 +182,8 @@
                     resultDiv.html(`
                         <img src="${coverImageUrlBase}${result.isbn}" alt="Cover Image" class="book-cover">
                         <div class="result-details">
-                            <p><strong>Title:</strong> ${result.title}</p>
-                            <p><strong>Author(s):</strong> ${result.authors}</p>
+                            <p><strong>${result.title}</strong></p>
+                            <p>${result.authors}</p>
                             <button class="select-btn btn btn-success"
                                 data-labels_set="${labels_set}" data-title="${result.title}" data-authors="${result.authors}"
                                 >Select</button>
