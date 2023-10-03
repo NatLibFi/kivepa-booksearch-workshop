@@ -9,7 +9,10 @@
 </head>
 
 <body>
-    <h1>Book Search</h1>
+    <header>
+        <h1>Book Search</h1>
+        <div class="user-number" id="user-number">User number<br> Loading...</div>
+    </header>
     <div class="container" id="main">
         <div class="left-column">
             <h2>Searched Books</h2>
@@ -99,6 +102,20 @@
 
         // Boolean to set the order of A and B columns
         var reversed;
+
+        async function getUserNumber() {
+            // Fetch the user_number from the server
+            const userNumberResponse = await fetch("/get_user_number");
+            const userNumberData = await userNumberResponse.json();
+            const userNumber = userNumberData.user_number;
+
+            // Display the user_number in the top-left corner of the page
+            if (userNumber !== null) {
+                $('#user-number').html(`User number<br>${userNumber}`);
+            } else {
+                $('#user-number').text('User number not available');
+            }
+        }
 
         async function submitBook(title, authors, isBookFoundA, isBookFoundB) {
             // Submit data about the search when proceeding to next book
@@ -200,6 +217,8 @@
             // Fetch and display selected books when the page loads
             generateBooksTable(reversed);
             $('.results-book-found').hide();
+
+            getUserNumber();
 
             $('#search-form').on('submit', async function (event) {
                 event.preventDefault();

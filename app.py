@@ -18,7 +18,7 @@ print(f"Connected to Elasticsearch at: {es_url}")
 sqlite3_db_path = "sqlite3-data/database.db"
 
 
-def create_table(cursor):
+def create_books_table(cursor):
     # Create a table if it doesn't exist
     cursor.execute(
         """
@@ -42,12 +42,50 @@ def create_table(cursor):
     )
 
 
+def create_users_table(cursor):
+    cursor.execute(
+        """
+        CREATE TABLE IF NOT EXISTS users (
+            user_number INTEGER PRIMARY KEY AUTOINCREMENT,
+            uid TEXT,
+            UNIQUE(uid)
+        )
+    """
+    )
+
+
+def register_user(uid):
+    with sqlite3.connect(sqlite3_db_path) as connection:
+        cursor = connection.cursor()
+        # Create the table if it doesn't exist
+        create_users_table(cursor)
+
+        cursor.execute(
+            """
+            INSERT OR IGNORE INTO users (uid) VALUES (?)
+        """,
+            (str(uid),),
+        )
+
+
 @app.route("/")
 def index():
     if "uid" not in session:
         session["uid"] = uuid.uuid4()
+        register_user(session["uid"])
     print(f"User {session['uid']}")
     return render_template("index.html")
+
+
+@app.route("/get_user_number")
+def get_user_number():
+    uid = str(session["uid"])
+    # Connect to the SQLite database and fetch the user_number
+    with sqlite3.connect(sqlite3_db_path) as connection:
+        cursor = connection.cursor()
+        cursor.execute("SELECT user_number FROM users WHERE uid = ? LIMIT 1", (uid,))
+        user_number = cursor.fetchone()[0]
+    return jsonify({"user_number": user_number})
 
 
 @app.route("/proceed", methods=["POST"])
@@ -70,7 +108,7 @@ def proceed_fn():
     with sqlite3.connect(sqlite3_db_path) as connection:
         cursor = connection.cursor()
         # Create the table if it doesn't exist
-        create_table(cursor)
+        create_books_table(cursor)
 
         # Insert the selected result into the database
         cursor.execute(
@@ -190,7 +228,7 @@ def get_searched_books_fn():
     with sqlite3.connect(sqlite3_db_path) as connection:
         cursor = connection.cursor()
 
-        create_table(cursor)
+        create_books_table(cursor)
         cursor.execute(
             """
             SELECT title, authors, is_found_a, is_found_b FROM searched_books
