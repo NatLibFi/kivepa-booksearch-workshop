@@ -191,11 +191,8 @@ def search_fn(labels_set):
     search_target_field = f"subjects-{labels_set}-labels"
     body = {
         "query": {
-            "terms_set": {
-                search_target_field: {
-                    "terms": search_terms,
-                    "minimum_should_match_script": {"source": "params.num_terms"},
-                }
+            "terms": {
+                search_target_field: search_terms,
             }
         }
     }
