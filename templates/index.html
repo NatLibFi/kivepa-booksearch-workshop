@@ -107,8 +107,10 @@
             // Fetch the user_number from the server
             const userNumberResponse = await fetch("/get_user_number");
             const userNumberData = await userNumberResponse.json();
-            const userNumber = userNumberData.user_number;
+            return userNumberData.user_number;
+        }
 
+        function displayUserNumber(userNumber) {
             // Display the user_number in the top-left corner of the page
             if (userNumber !== null) {
                 $('#user-number').html(`User number<br>${userNumber}`);
@@ -205,7 +207,8 @@
             return split(term).pop();
         }
 
-        $(document).ready(function () {
+        $(document).ready(async function() {
+            const userNumber = await getUserNumber();
             // Check the value of the "reversed" variable to determine the order
             reversed = true; // Set to true or false based on your logic
 
@@ -218,7 +221,7 @@
             generateBooksTable(reversed);
             $('.results-book-found').hide();
 
-            getUserNumber();
+            displayUserNumber(userNumber);
 
             $('#search-form').on('submit', async function (event) {
                 event.preventDefault();
