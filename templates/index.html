@@ -209,8 +209,9 @@
 
         $(document).ready(async function() {
             const userNumber = await getUserNumber();
-            // Check the value of the "reversed" variable to determine the order
-            reversed = true; // Set to true or false based on your logic
+
+            // For users with even number the order of columns is BA
+            reversed = userNumber % 2 === 0;
 
             if (reversed) {
                 // Move the right column to the left
