@@ -3,7 +3,7 @@ import sys
 
 from elasticsearch import Elasticsearch
 
-LIMIT = 10
+LIMIT = 100
 INDEX = "books"
 
 # Connect to Elasticsearch
@@ -12,7 +12,7 @@ if len(sys.argv) > 1:
 else:
     es_url = "http://localhost:9200"
 es = Elasticsearch(es_url)
-print(f"Connected to Elasticsearch at: {es_url}")
+# print(f"Connected to Elasticsearch at: {es_url}")
 
 
 scroll_time = "1m"  # Adjust this according to your needs
@@ -33,7 +33,12 @@ while True:
     # Extract field values from each document
     for doc in scroll_documents:
         documents.append(
-            (doc["_source"]["title"], doc["_source"]["authors"], doc["_source"]["desc"])
+            (
+                doc["_source"]["title"],
+                doc["_source"]["authors"],
+                doc["_source"]["isbn"],
+                '"' + doc["_source"]["desc"].replace('"', '"') + '"',
+            )
         )
 
     # Perform the next scroll
@@ -46,7 +51,4 @@ while True:
 random.shuffle(documents)
 
 for cnt, doc in enumerate(documents[:LIMIT]):
-    print("Book number: ", cnt)
-    print(doc[0], " | ", doc[1])
-    print(doc[2])
-    print("-" * 100)
+    print("\t".join(doc))
