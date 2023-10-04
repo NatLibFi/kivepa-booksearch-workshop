@@ -8,7 +8,7 @@ import requests
 from elasticsearch import Elasticsearch, helpers
 
 # Files to read data from
-BOOKS_FILE = "ks-bib-for-kivepa-prototype.json.gz"
+BOOKS_FILE = "ks-bib-for-kivepa-prototype2.json.gz"
 ANNIF_SUBJECTS_FILE = (
     "annif-subjects.json"  # work-uris as keys, subjects-uris as values
 )
@@ -37,9 +37,9 @@ def parse_book_json(book):
     agents = book.get("agents", {}).get("value", "").split()
     places = book.get("places", {}).get("value", "").split()
     times = book.get("times", {}).get("value", "").split()
-    # TODO Add genres too?
-    # Subjects fields are not present in json file
-    document["subjects-a-uris"] = themes + agents + places + times
+    genres = book.get("genres", {}).get("value", "").split()
+    subjects = book.get("subjects", {}).get("value", "").split()
+    document["subjects-a-uris"] = themes + agents + places + times + genres + subjects
     document["title"] = book["title"]["value"]
     document["authors"] = book["authorNames"]["value"]
     document["isbn"] = book["isbn"]["value"]
