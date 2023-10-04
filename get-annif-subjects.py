@@ -8,6 +8,9 @@ BOOKS_FILE = "ks-bib-for-kivepa-prototype.json.gz"
 ANNIF_SUBJECTS_FILE = "annif-subjects.json"  # File to save subjects to
 ANNIF_API_BASE = "https://dev.annif.org/v1/"
 PROJECT_ID = "kauno-ensemble-fi"
+# limit and threshold values for best f1 score given by optimize run
+LIMIT = 14
+THRESHOLD = 0.20
 
 
 def parse_book_json(book):
@@ -21,7 +24,9 @@ def parse_book_json(book):
 
 
 def annif_suggest(text):
-    results = annif.suggest(project_id=PROJECT_ID, text=text)
+    results = annif.suggest(
+        project_id=PROJECT_ID, text=text, limit=LIMIT, threshold=THRESHOLD
+    )
     return [res["uri"] for res in results]
 
 
