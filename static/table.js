@@ -8,14 +8,15 @@ async function generateBooksTable(reversed) {
 
         // Determine the order of the "Found in A" and "Found in B" columns based on 'reversed'
         // const reversed = true; // Set to true or false based on your logic
-        const columnOrder = reversed ? ['Found in B', 'Found in A'] : ['Found in A', 'Found in B'];
+        // const columnOrder = reversed ? ['Found in B', 'Found in A'] : ['Found in A', 'Found in B'];
+        const columnOrder = reversed ? ['Juonenjyvä', 'Tarinaluotsi'] : ['Tarinaluotsi', 'Juonenjyvä'];
 
         // Generate and insert the table head with the determined column order
         const tableHead = $('<thead>').html(`
             <tr>
                 <th>#</th>
-                <th>Title</th>
-                <th>Author(s)</th>
+                <th>Nimeke</th>
+                <th>Tekijä</th>
                 <th>${columnOrder[0]}</th>
                 <th>${columnOrder[1]}</th>
             </tr>

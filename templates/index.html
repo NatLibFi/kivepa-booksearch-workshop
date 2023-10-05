@@ -10,25 +10,25 @@
 
 <body>
     <header>
-        <h1>Book Search</h1>
-        <div class="user-number" id="user-number">User number<br> Loading...</div>
+        <h1>Kirjahaku</h1>
+        <div class="user-number" id="user-number">Käyttäjä nro<br>Ladataan...</div>
     </header>
     <div class="container" id="main">
         <div class="left-column">
-            <h2>Searched Books</h2>
+            <h2>Etsityt kirjat</h2>
             <table id="books-table" class="books-table"></table>
         </div>
         <div class="right-column">
-            <h2 id="labels-heading">Search</h2>
+            <h2 id="labels-heading">Haku</h2>
 
             <!-- Search form -->
             <form id="search-form" method="get">
-                <input type="text" id="search-input" name="q" placeholder="Enter book subject(s)" size="70">
-                <button type="submit" id="search-btn" class="btn btn-primary" disabled>Search</button>
+                <input type="text" id="search-input" name="q" placeholder="Aiheet" size="70">
+                <button type="submit" id="search-btn" class="btn btn-primary" disabled>Hae</button>
             </form>
             <!-- Button to proceed to next book -->
             <button type="button" id="proceed-btn" class="btn btn-danger" data-target="#proceed-modal">
-                Proceed to next book!
+                Seuraava kirja!
             </button>
 
             <!-- Book proceeding Modal -->
@@ -39,17 +39,17 @@
                             action="{{ url_for('proceed_fn') }}"
                             method="post" autocomplete="off">
                             <div class="modal-header">
-                                <h4 class="modal-title">What book was not found?</h4>
+                                <h4 class="modal-title">Mikä kirja jäi löytymättä?</h4>
                                 <button type="button" class="close" data-dismiss="modal">&times;</button>
                             </div>
                             <div class="modal-body">
-                                <label for="title">Book Title:</label>
+                                <label for="title">Nimeke:</label>
                                 <input type="text" id="title" name="title" class="form-control">
-                                <label for="authors">Book Author(s):</label>
+                                <label for="authors">Tekijä:</label>
                                 <input type="text" id="authors" name="authors" class="form-control">
                             </div>
                             <div class="modal-footer">
-                                <button type="submit" class="btn btn-primary">Confirm not-found</button>
+                                <button type="submit" class="btn btn-primary">Valmis</button>
                             </div>
                         </form>
                     </div>
@@ -58,21 +58,21 @@
             <div class="container">
                 <div class="row">
                     <div class="col-6" id="results-a-column">
-                        <h3>Labels A</h3>
+                        <h3>Tarinaluotsi</h3>
                         <div class="results" id="results-a">
                             <!-- Search results will be displayed here -->
                         </div>
                         <div class="results-book-found" id="results-book-found-a">
-                            Book found in here!
+                            Löytyi jo täältä!
                         </div>
                     </div>
                     <div class="col-6" id="results-b-column">
-                        <h3>Labels B</h3>
+                        <h3>Juonenjyvä</h3>
                         <div class="results" id="results-b">
                             <!-- Search results will be displayed here -->
                         </div>
                         <div class="results-book-found" id="results-book-found-b">
-                            Book found in here!
+                            Löytyi jo täältä!
                         </div>
                     </div>
                 </div>
@@ -113,9 +113,9 @@
         function displayUserNumber(userNumber) {
             // Display the user_number in the top-left corner of the page
             if (userNumber !== null) {
-                $('#user-number').html(`User number<br>${userNumber}`);
+                $('#user-number').html(`Käyttäjä nro<br>${userNumber}`);
             } else {
-                $('#user-number').text('User number not available');
+                $('#user-number').text('Käyttäjä nroa ei saatavilla');
             }
         }
 
@@ -174,7 +174,7 @@
 
             // Display the total number of results
             const coverImageUrlBase = "https://www.finna.fi/Cover/Show?source=Solr&invisbn=";
-            const totalCountDiv = $('<h4>').addClass('total-count').text(`Number of Results: ${totalCount}`);
+            const totalCountDiv = $('<h4>').addClass('total-count').text(`Tuloksia ${totalCount}`);
             resultsDiv.append(totalCountDiv);
 
             if (data.results) {
@@ -242,7 +242,7 @@
                     selectedTitleNew = $(this).data('title');
                     selectedAuthorsNew = $(this).data('authors');
                     if (typeof selectedTitle !== 'undefined' && selectedTitleNew != selectedTitle) {
-                        alert('Different selections!')
+                        alert('Eri valinnat!')
                     }
 
                     const labels_set = $(this).data('labels_set');
