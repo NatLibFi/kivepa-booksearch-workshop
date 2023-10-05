@@ -28,6 +28,13 @@ spec:
           volumeMounts:
             - name: sqlite-data
               mountPath: /app/sqlite3-data
+          resources:
+            limits:
+              cpu: "1.0"
+              memory: "500M"
+            requests:
+              cpu: "0.5"
+              memory: "100M"
       volumes:
         - name: sqlite-data
           persistentVolumeClaim:

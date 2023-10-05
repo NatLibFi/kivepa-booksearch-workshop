@@ -23,10 +23,10 @@ spec:
             docker.elastic.co/elasticsearch/elasticsearch:8.9.0
           resources:
             requests:
-              cpu: 0.9
+              cpu: "0.9"
             limits:
-              memory: 3Gi
-              cpu: 1
+              memory: "4G"
+              cpu: "1.0"
           env:
             - name: "xpack.security.enabled"
               value: "false"
