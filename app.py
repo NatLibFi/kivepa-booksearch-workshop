@@ -207,9 +207,8 @@ def search_fn(labels_set):
             result = {
                 "title": source["title"],
                 "authors": source.get("authors", "N/A"),
-                "year": source.get("year", "N/A"),
-                "score": hit["_score"],
                 "isbn": source["isbn"],
+                "labels": source[f"subjects-{labels_set}-labels"],
             }
             results.append(result)
         return jsonify({"results_count": hits_count, "results": results})

@@ -186,9 +186,13 @@
                         <div class="result-details">
                             <p><strong>${result.title}</strong></p>
                             <p>${result.authors}</p>
+                            <p class="labels">${result.labels.join(', ')}</p>
                             <button class="select-btn btn btn-success"
-                                data-labels_set="${labels_set}" data-title="${result.title}" data-authors="${result.authors}"
-                                >Valitse</button>
+                                data-labels_set="${labels_set}"
+                                data-title="${result.title}"
+                                data-authors="${result.authors}">
+                                    Valitse
+                            </button>
                         </div>
                     `);
                     resultsDiv.append(resultDiv);
