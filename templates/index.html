@@ -297,7 +297,7 @@
 
             $('#search-input')
                 .on('input', function () {
-                    $("#search-btn").prop('disabled', true);
+                    $("#search-btn").prop('disabled', false);
                     // Capture the initial input timestamp when the user starts typing
                     if (!searchBeginTime) {
                         searchBeginTime = new Date().toISOString();
@@ -335,7 +335,6 @@
                         // add placeholder to get the comma-and-space at the end
                         terms.push("");
                         this.value = terms.join(", ");
-                        $("#search-btn").prop('disabled', false);
                         return false;
                     },
                 });
