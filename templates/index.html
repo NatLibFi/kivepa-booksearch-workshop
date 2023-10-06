@@ -180,13 +180,13 @@
             if (data.results) {
                 data.results.forEach(result => {
                     const resultDiv = $('<div>').addClass('result');
-                    // In css book-cover.svg is set as background image for book cover images not in Finna
+                    const scoreTooltip = `Score: ${result.score}`;
+
                     resultDiv.html(`
-                        <img src="${coverImageUrlBase}${result.isbn}" alt="Cover Image" class="book-cover">
+                        <img title="${scoreTooltip}" src="${coverImageUrlBase}${result.isbn}" alt="Cover Image" class="book-cover">
                         <div class="result-details">
                             <p><strong>${result.title}</strong></p>
                             <p>${result.authors}</p>
-                            <p>Score: ${result.score}</p>
                             <p class="labels">${result.labels.join(', ')}</p>
                             <button class="select-btn btn btn-success"
                                 data-labels_set="${labels_set}"
