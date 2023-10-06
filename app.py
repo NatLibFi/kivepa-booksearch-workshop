@@ -191,8 +191,30 @@ def search_fn(labels_set):
     search_target_field = f"subjects-{labels_set}-labels"
     body = {
         "query": {
-            "terms": {
-                search_target_field: search_terms,
+            "function_score": {
+                "query": {
+                    "bool": {
+                        "should": [
+                            {"terms": {search_target_field: search_terms}},
+                        ],
+                        "minimum_should_match": 1,  # Adjust this based on your preference
+                    }
+                },
+                "script_score": {
+                    "script": {
+                        "source": f"""
+                            double score = 1.0;
+                            for (term in params.terms) {{
+                                if (doc['{search_target_field}'].contains(term)) {{
+                                    score += 0.5;  // Adjust the score boost based on your preference
+                                }}
+                            }}
+                            return score;
+                        """,
+                        "params": {"terms": search_terms},
+                    }
+                },
+                "boost_mode": "replace",
             }
         }
     }
