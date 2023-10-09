@@ -61,7 +61,8 @@ for book_json in books:
     if book["work-uri"] in books_annif_subjects:
         continue
     try:
-        book_annif_subjects = annif_suggest(book["desc"])
+        text = book["title"] + " " + book["desc"]
+        book_annif_subjects = annif_suggest(text)
     except Exception as err:
         print(f"annif-suggest error: {err}")
         continue
