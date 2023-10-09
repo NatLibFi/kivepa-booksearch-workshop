@@ -9,8 +9,8 @@ ANNIF_SUBJECTS_FILE = "annif-subjects.json"  # File to save subjects to
 ANNIF_API_BASE = "https://dev.annif.org/v1/"
 PROJECT_ID = "kauno-ensemble-fi"
 # limit and threshold values for best f1 score given by optimize run
-LIMIT = 14
-THRESHOLD = 0.20
+LIMIT = 18
+THRESHOLD = 0.16
 
 
 def parse_book_json(book):
