@@ -286,8 +286,10 @@
                     $('#results-book-found-' + labels_set).show();
 
                     if (isBookFoundA && isBookFoundB) {
-                        // No need to search anymore, disable search button
+                        // No need to search anymore, disable search
                         $("#search-btn").prop('disabled', true);
+                        $("#search-input").prop('disabled', true);
+                        $('#search-input').val('');
                         $("#proceed-btn").removeClass('btn-danger');
                         $("#proceed-btn").addClass('btn-success');
                     }
@@ -360,6 +362,7 @@
                     $('#proceed-modal').modal('show');
                 }
 
+                $("#search-input").prop('disabled', false);
                 $("#proceed-btn").removeClass('btn-success');
                 $("#proceed-btn").addClass('btn-danger');
 
