@@ -124,6 +124,11 @@ button:disabled {
     margin: 0 auto;
     color: white;
 }
+#scroll-to-top-btn {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+}
 
 .total-count {
     text-align: center;

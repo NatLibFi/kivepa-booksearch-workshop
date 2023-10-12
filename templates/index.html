@@ -81,6 +81,9 @@
             </div>
         </div>
     </div>
+    <div id="scroll-to-top-container">
+        <button id="scroll-to-top-btn" class="btn btn-secondary" title="Palaa ylös">&#9650;</button>
+    </div>
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
@@ -230,6 +233,7 @@
             $('.results-book-found').hide();
 
             displayUserNumber(userNumber);
+            $('#scroll-to-top-container').hide();
 
             // Clear search input button click event
             $('#clear-search-btn').on('click', function() {
@@ -373,6 +377,19 @@
                 selectedTitle = undefined;
             });
 
+            // Floating button click event
+            $('#scroll-to-top-btn').on('click', function() {
+                $('html, body').animate({ scrollTop: 0 }, 'slow');
+            });
+
+            // Show/hide the button based on the user's scroll position
+            $(window).scroll(function() {
+                if ($(this).scrollTop() > 100) {
+                    $('#scroll-to-top-container').fadeIn();
+                } else {
+                    $('#scroll-to-top-container').fadeOut();
+                }
+            });
         });
 
     </script>
