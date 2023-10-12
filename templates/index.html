@@ -25,6 +25,7 @@
             <!-- Search form -->
             <form id="search-form" method="get">
                 <input type="text" id="search-input" name="q" placeholder="Aiheet" size="70">
+                <button type="button" id="clear-search-btn" class="btn btn-danger">&#10006;</button>
                 <button type="submit" id="search-btn" class="btn btn-primary" disabled>Hae</button>
             </form>
             <!-- Button to proceed to next book -->
@@ -229,6 +230,12 @@
             $('.results-book-found').hide();
 
             displayUserNumber(userNumber);
+
+            // Clear search input button click event
+            $('#clear-search-btn').on('click', function() {
+                $('#search-input').val('');
+                $("#search-btn").prop('disabled', true);
+            });
 
             $('#search-form').on('submit', async function (event) {
                 event.preventDefault();

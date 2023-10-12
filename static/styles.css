@@ -108,10 +108,17 @@ button:disabled {
     cursor: default;
 }
 
-#search-btn {
-    margin-left: 0;
+#clear-search-btn {
+    color: black;
+    background: none;
+    border: none;
+    position: relative;
+    z-index: 1;
+    left: -42px;
 }
-
+#search-btn {
+    margin-left: -40px;
+}
 #proceed-btn {
     display: block;
     margin: 0 auto;
