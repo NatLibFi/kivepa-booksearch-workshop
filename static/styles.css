@@ -168,6 +168,17 @@ button:disabled {
     margin-left: 20px;
 }
 
+/* Add color coding for search result sources */
+#results-a-column h3,
+#results-a-column h4 {
+    color: #007bff; /* Blue color for source A */
+}
+
+#results-b-column h3,
+#results-b-column h4 {
+    color: #28a745; /* Green color for source B */
+}
+
 .labels {
     font-size: 14px;
 }
