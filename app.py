@@ -73,7 +73,7 @@ def index():
     if "uid" not in session:
         session["uid"] = uuid.uuid4()
         register_user(session["uid"])
-    print(f"User {session['uid']}")
+        print(f"Registered user with uid {session['uid']}")
     return render_template("index.html")
 
 
