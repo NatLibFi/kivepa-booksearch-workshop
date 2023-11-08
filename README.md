@@ -1,5 +1,5 @@
 # Booksearch application for workshop at Kirjastoverkkopäivät 2023
-An application which is planned to be used at the workshop of automated indexing of fiction books at Kirjastoverkkopäivät 2023.
+An application which was used at the [workshop of automated indexing of fiction books at Kirjastoverkkopäivät 2023](https://www.kansalliskirjasto.fi/fi/kirjastoverkkopaivat-2023-torstain-tyopajat#klo-9-12-tp3-kaunokirjallisuuden-automaattinen-sisallonkuvailu).
 
 Developed with help from ChatGPT.
 
@@ -9,7 +9,7 @@ Developed with help from ChatGPT.
     pip install -r requirements.txt
 
 ## Get subjects for books from Annif
-    time python get-annif-subjects.py  # Takes ~5 hours for all books
+    time python get-annif-subjects.py
 
 ## Local development
 ### Set up Elasticsearch and indices
@@ -27,9 +27,10 @@ Developed with help from ChatGPT.
     # gunicorn app:app  # Alternatively use gunicorn
 
 ## Deploy in OpenShift
-The application will be publicly available at https://kvp-2023-workshop.ext.kk-test.k8s.it.helsinki.fi/
+The application will be publicly available at the address given in [route template](https://github.com/juhoinkinen/kivepa-booksearch-workshop/blob/06f2e9ada71e73b90c993270e44058fc1067c8c7/helm-charts/templates/route.yaml#L10).
 
-The deploykey for the private repository containing the Dockerfile needs to be in place.
+If this repository is private a deploykey needs to be in place as a secret in Openshift.
+
 ### Install/update application
     helm upgrade --install kvp-2023-workshop helm-charts/
     # oc start-build kvp-2023-workshop-app  # Rebuild Docker image
@@ -42,8 +43,10 @@ The deploykey for the private repository containing the Dockerfile needs to be i
     time python import-books-to-es.py https://kvp-2023-workshop-elasticsearch.apps.kk-test.k8s.it.helsinki.fi:443 &> import-books.out
     python create-autocomplete-index.py https://kvp-2023-workshop-elasticsearch.apps.kk-test.k8s.it.helsinki.fi:443
 
-### Access app container for debugging etc.
-     oc rsh deployment/kvp-2023-workshop-app python -c "from elasticsearch import Elasticsearch; es = Elasticsearch('http://kvp-2023-workshop-elasticsearch:9200'); print(es.indices.get(index='*'))"
+### Database resetting and copying to local machine for analysis
+
+    # oc rsh deployment/kvp-2023-workshop-app rm sqlite3-data/database.db  # Delete
+    oc rsync <pod-name>:sqlite3-data/ ./os-sqlite3-data
 
 ## Elasticsearch queries
     curl http://localhost:9200/_aliases
@@ -57,14 +60,3 @@ The deploykey for the private repository containing the Dockerfile needs to be i
         }
       }
     }'
-
-
-
-## TODO How to set up the Apache Jena for data preprocessing
-Needed for running SPARQL query to process the file [kirjasampo-bib.json-ld.gz](https://github.com/NatLibFi/Annif-corpora-restricted/blob/master/kirjasampo/kirjasampo-bib.json-ld.gz).
-
-1. Download (latest) Jena from https://downloads.apache.org/jena/binaries/ and unpack it
-2. cd to the directory
-3. Start Jena `./fuseki-server`
-4. In a web browser navigate to http://localhost:3030/#/
-5. ?
