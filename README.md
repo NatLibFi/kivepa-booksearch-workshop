@@ -1,7 +1,13 @@
+# THIS REPOSITORY HAS BEEN ARCHIVED
+
 # Booksearch application for workshop at Kirjastoverkkopäivät 2023
 An application which was used at the [workshop of automated indexing of fiction books at Kirjastoverkkopäivät 2023](https://www.kansalliskirjasto.fi/fi/kirjastoverkkopaivat-2023-torstain-tyopajat#klo-9-12-tp3-kaunokirjallisuuden-automaattinen-sisallonkuvailu).
 
-Developed with help from ChatGPT.
+Developed with help by ChatGPT.
+
+See the article about the workshop:
+_Lehtinen M., Inkinen J. & Suominen O. (2023). Kaunokirjallisuuden automaattinen kuvailu – Tarinaluotsi vs. Juonenjyvä. Tietolinja, 2023(2)._
+Pysyvä osoite: https://urn.fi/URN:NBN:fi-fe20231218155441
 
 ## Set up local environment
     python3 -m venv venv
